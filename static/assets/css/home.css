@@ -86,7 +86,7 @@ padding-left: 0rem !important;
 }
 .nav-link {
     color: black;
-    font-weight: 900;
+    font-weight: 800 !important;
     font-size: medium;
     width:110px;
 

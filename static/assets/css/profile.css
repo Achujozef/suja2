@@ -274,6 +274,10 @@ font-size: medium;
     .profile-img {
       width: 80px;
     }
+    .prfl-contact-info{
+      
+      width: 100% !important;
+  }
   }
   @media screen and (max-width: 350px) and (min-width: 250px) {
   

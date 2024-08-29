@@ -242,12 +242,12 @@
                                 aria-expanded="false">
                                 <!-- <i class="bi bi-person-circle"></i> -->
                                  <div style="height: 100%; width: 40px; margin-top:-13%; padding-left: 20px;">
-                                    
+                                    <div style="height: 40px; width: 40px; border-radius: 100%; overflow: hidden;">
                                     {% if extended_user.profile_photo %}
                                     <img src="{{ extended_user.profile_photo.url }}" style="width: 40px; height:40px; bottom:15px;">
                                    {% else %}
                                    <img src="../static/assets/icons/profile.png" alt="" style="width: 40px; height:40px; bottom:15px;">
-                                   {% endif %}
+                                   {% endif %}</div>
                                  </div>
                                  
                             </a>
@@ -546,14 +546,14 @@
         </div>
     </section>
 
-    <footer class="footer-area pt-100 pb-70 bg-light">
+    <footer class="footer-area pt-100 pb-70 bg-light" style="background-image: url(../static/assets/images/abstract-blue.jpg); background-size: cover;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-xl-3 col-xxl-3 col-md-12 col-sm-12">
                     <div class="footer-widget">
                         <div class="footer-logo">
                             <a href="{% url 'ageis_app:index' %}">
-                                <img class="logo-footer" src="{% static 'assets/images/suja.jpg' %}" alt="logo">
+                                    <img class="logo-footer" src="{% static 'assets/images/SujaLogo.png' %}" alt="logo">
                             </a>
                         </div>
                         <p class="text-dark brand-quoete text-center"><i>We make Recruitment enjoyable, efficient,enagaging! Let’s create

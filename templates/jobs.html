@@ -44,6 +44,7 @@
     position: absolute;
     top: 10px;
 }
+
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -401,13 +402,24 @@
                                                 <!-- Existing Filters -->
                                                 <div class="col-md-3 mb-3">
                                                     <label for="client" class="form-label">Client:</label>
-                                                    <select name="client" id="client" class="form-select">
+                                                    <!-- <select name="client" id="client" class="form-select">
                                                         <option value="">Select Client</option>
                                                         {% for client in clients %}
                                                             <option value="{{ client.id }}" {% if request.GET.client == client.id|stringformat:"s" %}selected{% endif %}>
                                                                 {{ client.name }}
                                                             </option>
                                                         {% endfor %}
+                                                    </select> -->
+                                                    <select name="client" id="client" class="form-select">
+                                                      <option value="">Select Client</option>
+                                                      {% for client in clients %}
+                                                        <option value="{{ client.id }}" {% if request.GET.client == client.id %}selected{% endif %}>
+                                                          {{ client.company_name }}
+                                                        </option>
+                                                      {% endfor %}
+                                                      {% if clients|length == 0 %}
+                                                        <option disabled>No Clients Available</option>
+                                                      {% endif %}
                                                     </select>
                                                 </div>
                                     

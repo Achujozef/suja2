@@ -236,12 +236,12 @@
                                 aria-expanded="false">
                                 <!-- <i class="bi bi-person-circle"></i> -->
                                  <div style="height: 100%; width: 40px; margin-top:-13%; padding-left: 20px;">
-                                    
+                                    <div style="height: 40px; width: 40px; border-radius: 100%; overflow: hidden;">
                                     {% if extended_user.profile_photo %}
                                     <img src="{{ extended_user.profile_photo.url }}" style="width: 40px; height:40px; bottom:15px;">
                                    {% else %}
                                    <img src="../static/assets/icons/profile.png" alt="" style="width: 40px; height:40px; bottom:15px;">
-                                   {% endif %}
+                                   {% endif %}</div>
                                  </div>
                                  
                             </a>
@@ -1228,23 +1228,23 @@
 
 <div class="luck-bg">
     <div class="luck-bg-div">
-       <h2 class="text-center">Crush That Interview!!!</h2>
-       <h2 class="text-center"> GO and Get that JOB! Good Luck!</h2>
+       <h2 class="text-center">Crush that Interview!!!</h2>
+       <h2 class="text-center"> Go and get that job! good luck!</h2>
     </div>
 </div>
 
-<footer class="footer-area pt-100 pb-70 bg-light">
+<footer class="footer-area pt-100 pb-70 bg-light" style="background-image: url(../static/assets/images/abstract-blue.jpg); background-size: cover;">
     <div class="container">
         <div class="row">
             <div class="col-lg-3 col-xl-3 col-xxl-3 col-md-12 col-sm-12">
                 <div class="footer-widget">
                     <div class="footer-logo">
                         <a href="{% url 'ageis_app:index' %}">
-                                <img class="logo-footer" src="{% static 'assets/images/suja.jpg' %}" alt="logo">
+                                <img class="logo-footer" src="{% static 'assets/images/SujaLogo.png' %}" alt="logo">
                             </a>
                     </div>
-                    <p class="text-dark brand-quoete text-center"><i>We make Recruitment enjoyable, efficient,enagaging! Let’s create
-                        “Success Together"</i></p>
+                    <p class="text-dark brand-quoete text-center"><i>We make recruitment enjoyable, efficient & enagaging! Let’s create
+                        success together"</i></p>
                         <div class="footer-social">
                             <a href="https://www.facebook.com/profile.php?id=61558492872249" target="_blank"><i class="bx bxl-facebook footer-social-icon-face"></i></a>
                             <a href="#" target="_blank"><i class="bx bxl-instagram footer-social-icon-insta "></i></a>
@@ -1280,7 +1280,7 @@
                         <li>
                             <a class="text-dark" href="{% url 'ageis_app:interviewtips' %}">
                                 <i class="bx bx-chevrons-right bx-tada"></i>
-                                Interview Tips
+                                Interview tips
                             </a>
                         </li>
                     </ul>

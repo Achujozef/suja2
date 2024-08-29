@@ -497,7 +497,11 @@
                                  
                                             <p>Handeled by :<h5>{{i.handeled_by}}</h5></p>
                                           </td>
-                                          <td><a href="{{i.applied_user.cv.url}}" download>Download Resume</a></td>
+                                          <td>
+                                            {% if i.applied_user.cv %}
+                                            <a href="{{i.applied_user.cv.url}}" download>Download Resume</a>
+                                            {% endif %}
+                                          </td>
                                           <td>{{i.location}}</td>
                                           <td>
                                             {% if i.is_shortlisted %}
