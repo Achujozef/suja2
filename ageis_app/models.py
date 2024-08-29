@@ -145,7 +145,7 @@ from django.utils import timezone
 
 class AppliedJobs(models.Model):
     RESULT_CHOICES = [
-        ('default', 'Default'),
+        ('default', 'Pending'),
         ('selected', 'Selected'),
         ('rejected', 'Rejected'),
         ('offerletter_sent', 'Offer letter sent'),

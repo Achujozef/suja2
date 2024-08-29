@@ -79,6 +79,57 @@
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
 }
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+}
+
+thead tr {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 2px solid #ddd;
+}
+
+tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+td a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+td span {
+    color: #999;
+}
+
+tbody td:nth-child(3) {
+    color: #333;
+}
+
+tbody td:nth-child(3).selected {
+    color: green;
+}
+
+tbody td:nth-child(3).rejected {
+    color: red;
+}
+
        </style>
 
 </head>
@@ -744,7 +795,41 @@
                 </form>
                 </div>
             </div>
-
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Applied Jobs</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+                <thead>
+                    <tr style="background-color: #f2f2f2; text-align: left;">
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Job Title</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Company</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Status</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Offer Letter</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Applied Date</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in applied_jobs %}
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 12px;">{{ job.applied_job.job_title }}</td>
+                        <td style="padding: 12px;">{{ job.applied_job.company.company_name }}</td>
+                        <td style="padding: 12px; color: {% if job.get_result_display == 'Selected' %}green{% elif job.get_result_display == 'Rejected' %}red{% else %}#333{% endif %};">{{ job.get_result_display }}</td>
+                        <td style="padding: 12px;">
+                            {% if job.offer_letter %}
+                            <a href="{{ job.offer_letter.url }}" style="color: #007bff; text-decoration: none;">Download Offer Letter</a>
+                            {% else %}
+                            <span style="color: #999;">No Offer Letter</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px;">{{ job.applied_date }}</td>
+                        <td style="padding: 12px;">
+                            <a href="{% url 'ageis_app:jobs_details' job.applied_job.id %}" style="padding: 8px 12px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">View Job</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            
             {% comment %} <div class="edit-btn-div logout mb-5">
                 <a class="btn btn-special edit-prfl-btn" href="./change-password.html" ><i class="bi bi-pencil-square me-2"></i>Change password</a>
             </div> {% endcomment %}

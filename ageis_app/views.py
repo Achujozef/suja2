@@ -1635,13 +1635,14 @@ def user_profile(request):
         skills = user.skills.all()
         qualifications = user.qualifications.all()
         experiences = user.experiences.all()
-        
+        applied_jobs = AppliedJobs.objects.filter(applied_user=user)
         context = {
             'users': users,
             'user':user,
             'skills': skills,
             'qualifications': qualifications,
             'experiences': experiences,
+            'applied_jobs':applied_jobs,
         }
         
         return render(request, 'user_profile.html', context)
