@@ -424,6 +424,21 @@
                                             <label for="relocate">Willing Candidates <br> to relocate</label>
                                             <input type="checkbox" id="relocate" name="relocate" value="1" {% if request.GET.relocate %}checked{% endif %}>
                                           </div>
+                                          <div class="form-group col-md-2">
+                                            <label for="job_title">Preferred Job Title</label>
+                                            <input type="text" class="form-control" id="job_title" name="job_title" placeholder="Enter job title" value="{{ request.GET.job_title }}">
+                                        </div>
+                                        <!-- Add Languages Filter -->
+                                        <div class="form-group col-md-2">
+                                            <label for="languages">Languages</label>
+                                            <input type="text" class="form-control" id="languages" name="languages" placeholder="Enter languages" value="{{ request.GET.languages }}">
+                                        </div>
+
+                                        <div class="form-group col-md-2">
+                                          <label for="active_candidates">Active Candidates</label>
+                                          <input type="checkbox" id="active_candidates" name="active_candidates" value="1" {% if request.GET.active_candidates %}checked{% endif %}>
+                                      </div>
+
                                         </div>
                                         <button type="submit" class="btn btn-success">Filter</button>
                                       </form>
@@ -438,102 +453,171 @@
                                       <table id="example1" class="table table-bordered table-striped">
                                         <thead>
                                           <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Phone</th>
-                                            <th>qulification</th>
-                                            <th>Position</th>
-                                            <th>Address</th>
-                                            <th>Resume</th>
+                                            <th>Full Name</th>
+                                            <th>Basic Info</th> <!-- Combined column for DOB and Gender -->
+                                            <th>Contact Info</th> <!-- Combined column for email, phone, and address -->
+                                            <th>Qualification</th>
+                                            <th>Professional Info</th> <!-- Combined column for Position, Preferred Job Titles, and Resume -->
+                                            <th>Languages</th>
                                             <th>Actions</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          {% for i in userlist %}
-                
-                                          <tr>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in userlist %}
+                                        <tr>
                                             <td>
-                                            {% if i.user.first_name or i.user.last_name%}
-                                            {{ i.user.first_name }} {{ i.user.last_name }}
-                                            {% else %}
-                                            ---
-                                            {% endif %}
-                                          </td>
-                                            <td>
-                                            {% if i.user.email %}  
-                                            {{ i.user.email }}
-                                            {% else %}
-                                          Not added
-                                            {% endif %}
-                                          </td>
-                                          <td>
-                                            {% if i.phone %}   
-                                            {{ i.phone }}
-                                            {% else %}
-                                            Not added
-                                            {% endif %}
-                                          </td>
-                                          <td>
-                                            {% if i.qualifications.exists %}
-                                                <ul>
-                                                    {% for qualification in i.qualifications.all %}
-                                                        <li>{{ qualification.degree }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% else %}
-                                                No qualifications entered
-                                            {% endif %}
-                                        </td>
-
-
-                                          <td>
-                                            {% if i.position %}
-                                            {{ i.position }}
-                                            {% else %}
-                                            Not addedd
-                                          {% endif %}
-                                          </td>
-
-
-                                          <td>
-                                            {% if i.location or i.district or i.state or i.country %}
-                                                {% if i.location and i.location != "None" %}
-                                                    {{ i.location }}
+                                                {% if i.user.first_name or i.user.last_name %}
+                                                {{ i.user.first_name }} {{ i.user.last_name }}
+                                                {% else %}
+                                                Name not entered
                                                 {% endif %}
-                                                {% if i.district and i.district != "None" %}
-                                                    {% if i.location and i.location != "None" %}, {% endif %}{{ i.district }}
-                                                {% endif %}
-                                                {% if i.state and i.state != "None" %}
-                                                    {% if i.location != "None" or i.district != "None" %}, {% endif %}{{ i.state }}
-                                                {% endif %}
-                                                {% if i.country and i.country != "None" %}
-                                                    {% if i.location != "None" or i.district != "None" or i.state != "None" %}, {% endif %}{{ i.country }}
-                                                {% endif %}
-                                            {% else %}
-                                                Address not entered
-                                            {% endif %}
-                                        </td>
-                                        
-
-                                              {% if i.cv %}
-                                              <td><a href="{{ i.cv.url }}" download>Download Resume</a></td>
-                                              {% else %}
-                                              <td>---</td>
-                                              {% endif %}
-                                            <td>
-                                              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editUserModal{{ i.user.id }}">
-                                                Edit
-                                              </button>
-                                              {% if i.user.is_active %}
-                                              <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure you want to block this user?')) { window.location.href='{% url 'ageis_app:block_user' i.user.id %}'; }">
-                                                  Block
-                                              </button>
-                                          {% else %}
-                                              <button type="button" class="btn btn-success" onclick="if(confirm('Are you sure you want to unblock this user?')) { window.location.href='{% url 'ageis_app:unblock_user' i.user.id %}'; }">
-                                                  Unblock
-                                              </button>
-                                          {% endif %}
                                             </td>
+                                            <td>
+                                                <!-- Basic Info Column -->
+                                                {% if i.dob or i.gender %}
+                                                    <ul>
+                                                        {% if i.dob %}
+                                                        <li>Date of Birth: {{ i.dob|date:"Y-m-d" }}</li>
+                                                        {% else %}
+                                                        <li>Date of Birth: Not specified</li>
+                                                        {% endif %}
+                                                        {% if i.gender %}
+                                                        {% if i.gender == 'M' %}
+                                                        <li>Gender: Male</li>
+                                                        {% elif i.gender == 'F' %}
+                                                        <li>Gender: Female</li>
+                                                        {% elif i.gender == 'O' %}
+                                                        <li>Gender: Other</li>
+                                                        {% else %}
+                                                        <li>Gender: Not specified</li>
+                                                        {% endif %}
+                                                        {% else %}
+                                                        <li>Gender: Not specified</li>
+                                                        {% endif %}
+                                                    </ul>
+                                                {% else %}
+                                                Basic info not entered
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <!-- Contact Info Column -->
+                                                {% if i.user.email or i.phone or i.location or i.district or i.state or i.country %}
+                                                    <ul>
+                                                        {% if i.user.email %}
+                                                        <li>Email: {{ i.user.email }}</li>
+                                                        {% else %}
+                                                        <li>Email: Not added</li>
+                                                        {% endif %}
+                                                        {% if i.phone %}
+                                                        <li>Phone: {{ i.phone }}</li>
+                                                        {% else %}
+                                                        <li>Phone: Not added</li>
+                                                        {% endif %}
+                                                        {% if i.location or i.district or i.state or i.country or i.address %}
+                                                        <li>Address:
+                                                          {% if i.address and i.address != "None" %}
+                                                                {{ i.address }}
+                                                            {% endif %}
+                                                            {% if i.location and i.location != "None" %}
+                                                                {{ i.location }}
+                                                            {% endif %}
+                                                            {% if i.district and i.district != "None" %}
+                                                                {% if i.location and i.location != "None" %}, {% endif %}{{ i.district }}
+                                                            {% endif %}
+                                                            {% if i.state and i.state != "None" %}
+                                                                {% if i.location != "None" or i.district != "None" %}, {% endif %}{{ i.state }}
+                                                            {% endif %}
+                                                            {% if i.country and i.country != "None" %}
+                                                                {% if i.location != "None" or i.district != "None" or i.state != "None" %}, {% endif %}{{ i.country }}
+                                                            {% endif %}
+                                                        </li>
+                                                        {% else %}
+                                                        <li>Address: Not entered</li>
+                                                        {% endif %}
+                                                    </ul>
+                                                {% else %}
+                                                Contact info not entered
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <!-- Qualifications Column -->
+                                                {% if i.qualifications.exists %}
+                                                    <ul>
+                                                        {% for qualification in i.qualifications.all %}
+                                                            <li>{{ qualification.degree }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    No qualifications entered
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <!-- Professional Info Column -->
+                                                {% if i.position or i.user.preferred_job_titles.all or i.cv %}
+                                                            <ul>
+                                                                {% if i.position %}
+                                                                    <li>Position: {{ i.position }}</li>
+                                                                {% else %}
+                                                                    <li>Position: Not added</li>
+                                                                {% endif %}
+                                                                
+                                                                {% if i.user.preferred_job_titles.all %}
+                                                                    <li>Preferred Job Titles:
+                                                                        <ul>
+                                                                            {% for job_title in i.user.preferred_job_titles.all %}
+                                                                                <li>{{ job_title.job_title }}</li>
+                                                                            {% endfor %}
+                                                                        </ul>
+                                                                    </li>
+                                                                {% else %}
+                                                                    <li>Preferred Job Titles: Not entered</li>
+                                                                {% endif %}
+                                                                
+                                                                {% if i.cv %}
+                                                                    <li>Resume: <a href="{{ i.cv.url }}" download>Download Resume</a></li>
+                                                                {% else %}
+                                                                    <li>Resume: Not added</li>
+                                                                {% endif %}
+                                                                
+                                                                
+                                                            </ul>
+                                                        {% else %}
+                                                            Professional info not entered
+                                                        {% endif %}
+
+                                            </td>
+                                            <td>
+                                                <!-- Languages Column -->
+                                                {% if i.user.languages.all %}
+
+                                                                        <ul>
+                                                                            {% for language in i.user.languages.all %}
+                                                                                <li>{{ language.language }}</li>
+                                                                            {% endfor %}
+                                                                        </ul>
+         
+                                                                {% else %}
+                                                                    <li>Languages: Not entered</li>
+                                                                {% endif %}
+                                            </td>
+                                            <td>
+                                              <!-- Edit Button -->
+                                              <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#editUserModal{{ i.user.id }}">
+                                                  Edit
+                                              </button>
+                                              
+                                              <!-- Block/Unblock Button -->
+                                              {% if i.user.is_active %}
+                                                  <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure you want to block this user?')) { window.location.href='{% url 'ageis_app:block_user' i.user.id %}'; }">
+                                                      Block
+                                                  </button>
+                                              {% else %}
+                                                  <button type="button" class="btn btn-success" onclick="if(confirm('Are you sure you want to unblock this user?')) { window.location.href='{% url 'ageis_app:unblock_user' i.user.id %}'; }">
+                                                      Unblock
+                                                  </button>
+                                              {% endif %}
+                                          </td>
+                                          
                                           </tr>
                                     
                                           <!-- Edit User Modal -->
@@ -652,13 +736,12 @@
                                         </tbody>
                                         <tfoot>
                                           <tr>
-                                            <th>Full name</th>
-                                            <th>Email</th>
-                                            <th>Phone</th>
-                                            <th>qulification</th>
-                                            <th>Position</th>
-                                            <th>Address</th>
-                                            <th>Resume</th>
+                                            <th>Full Name</th>
+                                            <th>Basic Info</th> <!-- Combined column for DOB and Gender -->
+                                            <th>Contact Info</th> <!-- Combined column for email, phone, and address -->
+                                            <th>Qualification</th>
+                                            <th>Professional Info</th> <!-- Combined column for Position, Preferred Job Titles, and Resume -->
+                                            <th>Languages</th>
                                             <th>Actions</th>
                                           </tr>
                                         </tfoot>
@@ -666,7 +749,7 @@
                                     </div>
                                     
                                     <!-- Create User Modal -->
-                                    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+                                    {% comment %} <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
                                       <div class="modal-dialog modal-lg">
                                         <div class="modal-content">
                                           <div class="modal-header">
@@ -699,6 +782,20 @@
                                                 <label for="location">Current Location</label>
                                                 <input type="text" class="form-control" id="location" name="location" placeholder="Enter current location" required>
                                               </div>
+
+                                              <div class="form-group">
+                                                <label for="dob">Date of Birth</label>
+                                                <input type="date" class="form-control" id="dob" name="dob" required>
+                                              </div>
+                                              <div class="form-group">
+                                                <label for="gender">Gender</label>
+                                                <select class="form-control" id="gender" name="gender" required>
+                                                  <option value="M">Male</option>
+                                                  <option value="F">Female</option>
+                                                  <option value="O">Other</option>
+                                                </select>
+
+                                                
                                               <div class="form-group">
                                                 <label for="cv">Upload Resume</label>
                                                 <input type="file" class="form-control" id="cv" name="cv" placeholder="Upload resume">
@@ -770,8 +867,194 @@
                                           </form>
                                         </div>
                                       </div>
+                                    </div> {% endcomment %}
+                                 <!-- Create User Modal -->
+                                  <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="createUserModalLabel">Create New User</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        <form method="POST" action="{% url 'ageis_app:create_user' %}" enctype="multipart/form-data">
+                                          {% csrf_token %}
+                                          <div class="modal-body">
+                                            <!-- User Information -->
+                                            <div class="form-group">
+                                              <label for="first_name">First Name</label>
+                                              <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter first name" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="last_name">Last Name</label>
+                                              <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter last name" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="email">Email Address</label>
+                                              <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="phone">Phone Number</label>
+                                              <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="address">Address</label>
+                                              <input type="text" class="form-control" id="address" name="address" placeholder="Eg: House no 134 / Kattakada Road / Kattakode" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="location">City</label>
+                                              <input type="text" class="form-control" id="location" name="location" placeholder="Enter current location" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="district">District</label>
+                                              <input type="text" class="form-control" id="district" name="district" placeholder="Enter district" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="state">State</label>
+                                              <input type="text" class="form-control" id="state" name="state" placeholder="Enter state" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="country">Country</label>
+                                              <input type="text" class="form-control" id="country" name="country" placeholder="Enter country" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="dob">Date of Birth</label>
+                                              <input type="date" class="form-control" id="dob" name="dob" required>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="gender">Gender</label>
+                                              <select class="form-control" id="gender" name="gender" required>
+                                                <option value="M">Male</option>
+                                                <option value="F">Female</option>
+                                                <option value="O">Other</option>
+                                              </select>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="profile_photo">Upload Profile Image</label>
+                                              <input type="file" class="form-control" id="profile_photo" name="profile_photo" placeholder="Upload Profile Image">
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="cv">Upload Resume</label>
+                                              <input type="file" class="form-control" id="cv" name="cv" placeholder="Upload resume">
+                                            </div>
+                                            <div class="form-check">
+                                              <input type="checkbox" class="form-check-input" id="relocate_add" name="relocate_add">
+                                              <label class="form-check-label" for="relocate_add">Willing to relocate</label>
+                                            </div>
+                                            <!-- Skills -->
+                                            <div class="form-group">
+                                              <label for="skills">Skills</label>
+                                              <textarea class="form-control" id="skills" name="skills" placeholder="Enter skills separated by commas" rows="3"></textarea>
+                                            </div>
+
+                                            <!-- Qualifications -->
+                                            <div class="form-group">
+                                              <label for="qualifications">Qualifications</label>
+                                              <div id="qualification_fields">
+                                                <div class="qualification_field">
+                                                  <div class="form-group">
+                                                    <label for="degree">Degree</label>
+                                                    <input type="text" class="form-control mb-2" name="degree[]" placeholder="e.g., B.Sc. in Computer Science">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="institution">Institution</label>
+                                                    <input type="text" class="form-control mb-2" name="institution[]" placeholder="e.g., XYZ University">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="completion_year">Completion Year</label>
+                                                    <input type="number" class="form-control mb-2" name="completion_year[]" placeholder="e.g., 2024">
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <button type="button" class="btn btn-secondary" id="addQualification">Add More Qualifications</button>
+                                            </div>
+
+
+
+                                                  <!-- Current Job Information -->
+                                                  <div class="form-group">
+                                                    <label for="experience">Professional Experience</label>
+                                                    <div class="form-check">
+                                                      <input type="checkbox" class="form-check-input" id="currently_working" name="currently_working">
+                                                      <label class="form-check-label" for="currently_working">Currently Working</label>
+                                                    </div>
+                                                  </div>
+
+                                                  <div id="current_job_fields" style="display: none;">
+                                                    <div class="form-group">
+                                                      <label for="current_company">Name of your current company</label>
+                                                      <input type="text" class="form-control" id="current_company" name="current_company" placeholder="Enter current company">
+                                                    </div>
+                                                    <div class="form-group">
+                                                      <label for="current_start_date">Current Start Date</label>
+                                                      <input type="date" class="form-control" id="current_start_date" name="current_start_date">
+                                                    </div>
+                                                    <div class="form-group">
+                                                      <label for="current_position">Position</label>
+                                                      <input type="text" class="form-control" id="current_position" name="current_position" placeholder="Enter current_position">
+                                                    </div>
+                                                    <div class="form-group">
+                                                      <label for="discription">Job Responsibilities & Achievements</label>
+                                                      <input type="text" class="form-control" id="discription" name="discription" placeholder="Enter discription about your current job">
+                                                    </div>
+                                                  </div>
+
+
+
+                                            <!-- Experience -->
+                                            <div class="form-group">
+                                              <label for="experience">Previous Company Experience</label>
+                                              <div id="experience_fields">
+                                                <div class="experience_field">
+                                                  <div class="form-group">
+                                                    <label for="company">Company Name</label>
+                                                    <input type="text" class="form-control mb-2" name="company[]" placeholder="e.g., ABC Corp">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="position">Position Title</label>
+                                                    <input type="text" class="form-control mb-2" name="position[]" placeholder="e.g., Software Engineer">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="start_date">Start Date</label>
+                                                    <input type="date" class="form-control mb-2" name="start_date[]">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="end_date">End Date</label>
+                                                    <input type="date" class="form-control mb-2" name="end_date[]">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="description">Job Responsibilities & Achievements</label>
+                                                    <textarea class="form-control mb-2" name="description[]" placeholder="Describe your responsibilities and achievements" rows="3"></textarea>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <button type="button" class="btn btn-secondary" id="addExperience">Add More Experience</button>
+                                            </div>
+
+                                            <!-- Preferred Job Titles -->
+                                            <div class="form-group">
+                                              <label for="preferred_job_titles">Preferred Job Titles (separate with commas)</label>
+                                              <input type="text" class="form-control" id="preferred_job_titles" name="preferred_job_titles" placeholder="e.g., Developer, Designer">
+                                            </div>
+
+                                            <!-- Languages -->
+                                            <div class="form-group">
+                                              <label for="languages">Languages (separate with commas)</label>
+                                              <input type="text" class="form-control" id="languages" name="languages" placeholder="e.g., English, Hindi">
+                                            </div>
+
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Create User</button>
+                                          </div>
+                                        </form>
+                                      </div>
                                     </div>
-                                 
+                                  </div>
+
 
                                     
                                     <!-- /.card-body -->
@@ -800,6 +1083,19 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+  document.getElementById('currently_working').addEventListener('change', function () {
+    var currentJobFields = document.getElementById('current_job_fields');
+    if (this.checked) {
+      currentJobFields.style.display = 'block';
+    } else {
+      currentJobFields.style.display = 'none';
+    }
+  });
+</script>
+
 
 <script>
   $(document).ready(function() {

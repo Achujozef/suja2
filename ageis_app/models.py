@@ -5,6 +5,11 @@ from django.contrib.auth.models import User
 class ExtendedUserModel(models.Model):
     def __str__(self):
         return self.user.username
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
+    ]
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='extenedusermodel',blank=True,null=True)
     phone = models.CharField(max_length=20,blank=True,null=True)
     cv = models.FileField(upload_to='CV',blank=True,null=True)
@@ -17,7 +22,24 @@ class ExtendedUserModel(models.Model):
     state = models.CharField(max_length=100, blank=True, null=True)
     district = models.CharField(max_length=100, blank=True, null=True)
     relocate = models.BooleanField(default=False)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+    dob = models.DateField(blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    currently_working = models.BooleanField(default=False)
+    current_company = models.CharField(max_length=255, blank=True, null=True)
+    current_start_date = models.DateField(blank=True, null=True)
+    discription = models.TextField(blank=True, null=True)
 
+class Language(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='languages')
+    language = models.CharField(max_length=100)
+    
+
+
+class PreferredJobTitle(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='preferred_job_titles')
+    job_title = models.CharField(max_length=255)
+    
 
 
 

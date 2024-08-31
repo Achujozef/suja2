@@ -1,7 +1,9 @@
+import random
 from django.shortcuts import get_object_or_404, render,redirect
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib.auth.models import User,auth
 from django.contrib import messages
+import requests
 from ageis_app.models import *
 from ageis_app.forms import *
 from django.contrib.auth.decorators import login_required
@@ -159,33 +161,68 @@ def admin_registration(request):
             return redirect('ageis_app:admin_registration')
     return render(request,'admin-register.html')
 
+def send_otp(phone_num, otp):
+    print("Reached Otp sent helper")
+    url = "https://www.fast2sms.com/dev/bulkV2"
+    payload = f'variables_values={otp}&route=otp&language=english&numbers={phone_num}'
+    headers = {
+        'authorization': "mEgP0Z5wnldKSerOu1GW8qUbVctH3jkYaM7QCI4Jzp69XNT2ALFmiofRb467D0rSOWVB3qp8J5HYeIvt",
+        'Content-Type': "application/x-www-form-urlencoded",
+        'Cache-Control': "no-cache",
+    }
+    
+    try:
+        response = requests.post(url, data=payload, headers=headers)
+        response_data = response.json()
+        
+        if response_data.get("return") == True:
+            print("OTP sent successfully")
+            return True
+        else:
+            print(f"Failed to send OTP: {response_data.get('message')}")
+            return False
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return False
+
+def generate_otp():
+    return str(random.randint(1000, 9999))
+
 
 def email_submission(request):
     if request.method == 'POST':
         email = request.POST.get('email')
-        
-        # Check if the email is already registered (optional)
+        phone = request.POST.get('phone')
 
         # Generate OTP
-        otp = get_random_string(length=6, allowed_chars='0123456789')
+        otp = generate_otp()
+
+        if email:
+            # Save OTP to the session for email
+            request.session['email'] = email
+            request.session['otp'] = otp
+
+            # Send OTP to the email
+            send_mail(
+                'Your OTP Code',
+                f'Your OTP code is: {otp}',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
+            messages.success(request, 'OTP has been sent to your email.')
         
-        # Save OTP to the session
-        request.session['email'] = email
-        request.session['otp'] = otp
-        print("session email", request.session['email'])
-        print("session otp", request.session['otp'])
-        # Send OTP to the email
-        send_mail(
-            'Your OTP Code',
-            f'Your OTP code is: {otp}',
-            settings.EMAIL_HOST_USER,
-            [email],
-            fail_silently=False,
-        )
+        elif phone:
+            # Save OTP to the session for phone
+            request.session['phone'] = phone
+            request.session['otp'] = otp
+
+            # Send OTP to the phone number
+            send_otp(phone, otp)
+            messages.success(request, 'OTP has been sent to your phone number.')
         
-        messages.success(request, 'OTP has been sent to your email.')
         return redirect('ageis_app:otp_verification')
-    
+
     return render(request, 'email_login.html')
 
 
@@ -193,37 +230,64 @@ from django.contrib.auth import authenticate, login as auth_login
 
 def otp_verification(request):
     if request.method == 'POST':
+        # Retrieve the phone number and email from the session
+        phone_num = request.session.get('phone')
         email = request.session.get('email')
+        
+        # Retrieve the entered OTP from the request
         otp_entered = request.POST.get('otp')
         
-        # Get the OTP from the session
+        # Retrieve the saved OTP from the session
         otp_saved = request.session.get('otp')
-        print('otp_entered',otp_entered)
-        print('otp_saved',otp_saved)
-        if otp_saved and otp_entered == otp_saved:
-            # Check if the user already exists
-            if User.objects.filter(email=email).exists():
-                user = User.objects.get(email=email)
-            else:
-                # Create a new user if they do not exist
-                username = email.split('@')[0]  # Simple username generation
-                user = User.objects.create_user(username=username, email=email, password='12345678')
-                extended_user = ExtendedUserModel.objects.create(user=user)
-            # Authenticate using the email (or username) and the user's actual password
-            
-            user = authenticate(username=user.username, password='12345678')
-            print(user)
-            if user is not None:
-                auth_login(request, user)  # Use auth_login to avoid the conflict
-                messages.success(request, 'OTP verified and logged in successfully.')
-                request.session.pop('email', None)
-                request.session.pop('otp', None)
-                return redirect('ageis_app:index')  # Redirect to home or another page
 
+        print('otp_entered:', otp_entered)
+        print('otp_saved:', otp_saved)
+
+        if otp_saved and otp_entered == otp_saved:
+            # Handle Phone Number Verification
+            if phone_num:
+                # Check if a user with this phone number already exists
+                if ExtendedUserModel.objects.filter(phone=phone_num).exists():
+                    user = ExtendedUserModel.objects.get(phone=phone_num).user
+                else:
+                    # Create a new user if they do not exist
+                    username = f"user_{phone_num[-4:]}"  # Simple username generation based on phone number
+                    user = User.objects.create_user(username=username, password='12345678')
+                    ExtendedUserModel.objects.create(user=user, phone=phone_num)
+            
+            # Handle Email Verification
+            elif email:
+                # Check if a user with this email already exists
+                if User.objects.filter(email=email).exists():
+                    user = User.objects.get(email=email)
+                else:
+                    # Create a new user if they do not exist
+                    username = email.split('@')[0]  # Simple username generation based on email
+                    user = User.objects.create_user(username=username, email=email, password='12345678')
+                    ExtendedUserModel.objects.create(user=user)
+            
+            # If neither phone number nor email is provided, raise an error
+            else:
+                messages.error(request, "No phone number or email provided for verification.")
+                return redirect('ageis_app:otp_verification')
+
+            # Authenticate the user
+            user = authenticate(username=user.username, password='12345678')
+            if user is not None:
+                auth_login(request, user)  # Log the user in
+                messages.success(request, 'OTP verified and logged in successfully.')
+                
+                # Clear the session data
+                request.session.pop('email', None)
+                request.session.pop('phone_num', None)
+                request.session.pop('otp', None)
+                
+                return redirect('ageis_app:index')  # Redirect to home or another page
             else:
                 messages.error(request, 'Authentication failed.')
         else:
             messages.error(request, 'Invalid OTP or OTP has expired.')
+        
         return redirect('ageis_app:otp_verification')
     
     return render(request, 'otp_verification.html')
@@ -391,6 +455,19 @@ def create_user(request):
         phone = request.POST.get('phone')
         location = request.POST.get('location')
         cv = request.FILES.get('cv')
+        profile_photo = request.FILES.get('profile_photo')
+        dob = request.POST.get('dob')
+        gender = request.POST.get('gender')
+        country = request.POST.get('country')
+        state = request.POST.get('state')
+        district = request.POST.get('district')
+        discription = request.POST.get('discription', '')
+        currently_working = request.POST.get('currently_working') == 'on'
+        relocate_add = request.POST.get('relocate_add') == 'on'
+        current_company = request.POST.get('current_company', '')
+        current_start_date = request.POST.get('current_start_date')
+        current_position = request.POST.get('current_position', '')
+        address = request.POST.get('address', '')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already exists.')
@@ -398,7 +475,26 @@ def create_user(request):
 
         username = email.split('@')[0]
         user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email)
-        extended_user = ExtendedUserModel(user=user, phone=phone, location=location, cv=cv)
+        extended_user = ExtendedUserModel(
+            user=user,
+            phone=phone,
+            location=location,
+            profile_photo = profile_photo,
+            country=country,
+            state=state,
+            district=district,
+            relocate = relocate_add,
+            cv=cv,
+            dob=dob,
+            address=address,
+            gender=gender,
+            currently_working=currently_working,
+            current_company=current_company,
+            current_start_date=current_start_date if current_start_date else None,
+            position=current_position,
+            discription = discription,
+
+        )
         extended_user.save()
 
         # Handle Skills
@@ -436,6 +532,20 @@ def create_user(request):
                     end_date=end_date if end_date else None,
                     description=description
                 )
+        # Handle Preferred Job Titles
+        preferred_job_titles = request.POST.get('preferred_job_titles', '')
+        preferred_job_titles_list = [title.strip() for title in preferred_job_titles.split(',') if title.strip()]
+        for title in preferred_job_titles_list:
+            PreferredJobTitle.objects.create(user=extended_user.user, job_title=title)
+
+        # Handle Languages
+        languages = request.POST.get('languages', '')
+        languages_list = [language.strip() for language in languages.split(',') if language.strip()]
+        for language in languages_list:
+            Language.objects.create(user=extended_user.user, language=language)
+
+
+
 
         messages.success(request, 'User created successfully.')
         return redirect('ageis_app:user_management')  # Replace with your actual user list view
@@ -1011,9 +1121,10 @@ def jobs_frontend_cat(request, cat_id=None):
 @login_required(login_url='ageis_app:login')
 def jobs_details(request, job_id):
     job = get_object_or_404(Jobs, id=job_id)
+    extenedusermodel = request.user.extenedusermodel 
     applied = AppliedJobs.objects.filter(applied_user=request.user.extenedusermodel, applied_job=job).exists()
 
-    return render(request, 'job-details.html', {'details': job, 'applied': applied})
+    return render(request, 'job-details.html', {'details': job, 'applied': applied , 'extenedusermodel':extenedusermodel})
 
 # product list page, product view page
 
@@ -1021,9 +1132,10 @@ def jobs_details(request, job_id):
 @login_required(login_url='ageis_app:adminlogin')
 def user_management(request):
     userlist = ExtendedUserModel.objects.filter(
-        user__is_staff=False,
-        user__is_superuser=False
-    ).order_by('-id')
+    user__is_staff=False,
+    user__is_superuser=False
+).order_by('-id').select_related('user').prefetch_related('user__preferred_job_titles', 'user__languages')
+
 
     skill_filter = request.GET.get('skill')
     qualification_filter = request.GET.get('qualification')
@@ -1033,6 +1145,10 @@ def user_management(request):
     district_filter = request.GET.get('district')
     location_filter = request.GET.get('location')
     relocate_filter = request.GET.get('relocate')
+    job_title_filter = request.GET.get('job_title')
+    languages_filter = request.GET.get('languages')
+    active_candidates_filter = request.GET.get('active_candidates')
+
 
     if skill_filter:
         skills = [skill.strip() for skill in skill_filter.split(',')]
@@ -1060,9 +1176,24 @@ def user_management(request):
     if location_filter:
         userlist = userlist.filter(location__iregex=location_filter)
 
-    print("relocate_filter",relocate_filter)
     if relocate_filter:
         userlist = userlist.filter(relocate=True)
+        
+    if active_candidates_filter:
+        userlist = userlist.filter(user__is_active=True)
+
+    if job_title_filter:
+        job_titles = [title.strip() for title in job_title_filter.split(',')]
+        for title in job_titles:
+            user_ids_with_job_title = PreferredJobTitle.objects.filter(job_title__icontains=title).values_list('user_id', flat=True)
+            userlist = userlist.filter(user_id__in=user_ids_with_job_title)
+
+    if languages_filter:
+        languages = [language.strip() for language in languages_filter.split(',')]
+        for language in languages:
+            user_ids_with_language = Language.objects.filter(language__icontains=language).values_list('user_id', flat=True)
+            userlist = userlist.filter(user_id__in=user_ids_with_language)
+
 
     return render(request, 'user-management.html', {'userlist': userlist})
 
@@ -1639,6 +1770,8 @@ def user_profile(request):
         qualifications = user.qualifications.all()
         experiences = user.experiences.all()
         applied_jobs = AppliedJobs.objects.filter(applied_user=user)
+        languages = user.user.languages.all()
+        preferred_job_titles = user.user.preferred_job_titles.all()
         context = {
             'users': users,
             'user':user,
@@ -1646,6 +1779,8 @@ def user_profile(request):
             'qualifications': qualifications,
             'experiences': experiences,
             'applied_jobs':applied_jobs,
+            'languages': languages,
+            'preferred_job_titles': preferred_job_titles,
         }
         
         return render(request, 'user_profile.html', context)
@@ -1653,6 +1788,34 @@ def user_profile(request):
       
         return render(request, 'error.html', {'message': 'User not authenticated'})
     
+@login_required
+def add_language(request):
+    if request.method == 'POST':
+        language = request.POST.get('language')
+        if language:
+            Language.objects.create(user=request.user, language=language)
+        return redirect('ageis_app:user_profile')
+
+@login_required
+def delete_language(request, language_id):
+    language = get_object_or_404(Language, id=language_id, user=request.user)
+    language.delete()
+    return redirect('ageis_app:user_profile')
+
+@login_required
+def add_job_title(request):
+    if request.method == 'POST':
+        job_title = request.POST.get('job_title')
+        if job_title:
+            PreferredJobTitle.objects.create(user=request.user, job_title=job_title)
+        return redirect('ageis_app:user_profile')
+
+@login_required
+def delete_job_title(request, job_title_id):
+    job_title = get_object_or_404(PreferredJobTitle, id=job_title_id, user=request.user)
+    job_title.delete()
+    return redirect('ageis_app:user_profile')
+
 
 def add_skill(request):
     if request.method == 'POST':
@@ -1662,7 +1825,7 @@ def add_skill(request):
             skill.user = request.user.extenedusermodel
             skill.save()
             messages.success(request, 'Skill added successfully.')
-            return redirect('user_profile')
+            return redirect('ageis_app:user_profile')
     else:
         form = SkillForm()
 
@@ -1683,7 +1846,7 @@ def add_qualification(request):
             qualification.user = request.user.extenedusermodel
             qualification.save()
             messages.success(request, 'Qualification added successfully.')
-            return redirect('user_profile')
+            return redirect('ageis_app:user_profile')
     else:
         form = QualificationForm()
 
@@ -1693,7 +1856,7 @@ def delete_qualification(request, qualification_id):
     qualification = get_object_or_404(Qualification, id=qualification_id)
     qualification.delete()
     messages.success(request, 'Qualification deleted successfully.')
-    return redirect('user_profile')
+    return redirect('ageis_app:user_profile')
 
 def add_experience(request):
     if request.method == 'POST':
@@ -1703,7 +1866,7 @@ def add_experience(request):
             experience.user = request.user.extenedusermodel
             experience.save()
             messages.success(request, 'Experience added successfully.')
-            return redirect('user_profile')
+            return redirect('ageis_app:user_profile')
     else:
         form = ExperienceForm()
 

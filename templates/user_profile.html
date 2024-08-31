@@ -718,6 +718,116 @@ tbody td:nth-child(3).rejected {
                 </div>
             </div>
 
+
+
+
+            <div class="container mt-4">
+    <!-- Languages Section -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Languages</h3>
+            <!-- Add Language Button -->
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addLanguageModal">
+                Add Language
+            </button>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for language in languages %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ language.language }}
+                        <!-- Delete Language Button -->
+                        <form action="{% url 'ageis_app:delete_language' language.id %}" method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Preferred Job Titles Section -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Preferred Job Titles</h3>
+            <!-- Add Job Title Button -->
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addJobTitleModal">
+                Add Job Title
+            </button>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for job_title in preferred_job_titles %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ job_title.job_title }}
+                        <!-- Delete Job Title Button -->
+                        <form action="{% url 'ageis_app:delete_job_title' job_title.id %}" method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Add Language Modal -->
+<div class="modal fade" id="addLanguageModal" tabindex="-1" aria-labelledby="addLanguageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLanguageModalLabel">Add Language</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'ageis_app:add_language' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="language" class="form-label">Language</label>
+                        <input type="text" class="form-control" id="language" name="language" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Language</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Job Title Modal -->
+<div class="modal fade" id="addJobTitleModal" tabindex="-1" aria-labelledby="addJobTitleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addJobTitleModalLabel">Add Job Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'ageis_app:add_job_title' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="job_title" class="form-label">Job Title</label>
+                        <input type="text" class="form-control" id="job_title" name="job_title" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Job Title</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
             <div class="form-div" id="experience-update">
                 <div class="close-btn" id="experience-close-btn">
                     <a href="" class="btn btn-special"><i class="bi bi-x"></i></a>
@@ -794,6 +904,8 @@ tbody td:nth-child(3).rejected {
                     </div>
                 </form>
                 </div>
+                
+                
             </div>
             <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Applied Jobs</h2>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">

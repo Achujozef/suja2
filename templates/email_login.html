@@ -97,28 +97,43 @@
     
     <div class="full-div reg-div">
         <div class="container">
-            <div class="back-home" style="margin-top: 70px !important;"><a class="back-home-a" href="{% url 'ageis_app:index' %}"><i
-                class="bi bi-house-up-fill back-home-icon text-dark"></i></a>
+            <div class="back-home" style="margin-top: 70px !important;">
+                <a class="back-home-a" href="{% url 'ageis_app:index' %}">
+                    <i class="bi bi-house-up-fill back-home-icon text-dark"></i>
+                </a>
             </div>
             <div class="frm-login">
                 <img class="frm-logo" src="{% static 'assets/images/suja.jpg' %}" alt="Agies Logo">
                 <h2 class="reg-h2">Sign In</h2>
-                <form method="POST" action="{% url 'ageis_app:email_submission' %}">
+    
+                <!-- Initially show the two buttons -->
+                <div id="location-selection">
+                    <button id="btn-india" class="btn btn-special form-control-btn w-50">Are you logging in from India?</button>
+                    <button id="btn-outside-india" class="btn btn-special form-control-btn w-50">Are you logging in from outside India?</button>
+                </div>
+    
+                <!-- Email input field -->
+                <form method="POST" action="{% url 'ageis_app:email_submission' %}" id="email-form" style="display: none;">
                     {% csrf_token %}
                     <input type="email" name="email" class="form-control form-control-1 w-50" id="email" placeholder="Enter your email" required>
                     <button type="submit" class="btn btn-special form-control-btn w-50">Send OTP</button>
                 </form>
-                
-
-               
+    
+                <!-- Phone number input field -->
+                <form method="POST" action="{% url 'ageis_app:email_submission' %}" id="phone-form" style="display: none;">
+                    {% csrf_token %}
+                    <input type="text" name="phone" class="form-control form-control-1 w-50" id="phone" placeholder="Enter your phone number" required>
+                    <button type="submit" class="btn btn-special form-control-btn w-50">Send OTP</button>
+                </form>
             </div>
         </div>
-        
     </div>
+    
 
 {% for message in messages %}
 {% if message.tags == 'success' %}
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 <script>
 var m="{{message}}";
 swal("{{message}}",'','success')
@@ -161,6 +176,18 @@ swal("{{message}}",'','error')
     </script>
 
     <script src="{% static 'assets/js/home.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $("#btn-india").click(function () {
+                $("#location-selection").hide();
+                $("#phone-form").show();
+            });
+            $("#btn-outside-india").click(function () {
+                $("#location-selection").hide();
+                $("#email-form").show();
+            });
+        });
+    </script>
 </div>
 </body>
 </html>

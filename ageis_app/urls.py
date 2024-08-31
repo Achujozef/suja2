@@ -131,4 +131,10 @@ urlpatterns = [
     path('staff/delete/<int:staff_id>/', views.delete_staff, name='delete_staff'),  # This handles deletion
     path('block-user/<int:user_id>/', views.block_user, name='block_user'),
     path('unblock-user/<int:user_id>/', views.unblock_user, name='unblock_user'),
+
+
+     path('add-language/', views.add_language, name='add_language'),
+    path('delete-language/<int:language_id>/', views.delete_language, name='delete_language'),
+    path('add-job-title/', views.add_job_title, name='add_job_title'),
+    path('delete-job-title/<int:job_title_id>/', views.delete_job_title, name='delete_job_title'),
 ]

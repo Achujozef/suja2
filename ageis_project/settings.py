@@ -181,7 +181,7 @@ EMAIL_HOST_USER = 'achujoseph@trivlogic.com'
 EMAIL_HOST_PASSWORD = 'Achujoseph@123'
 
 DEFAULT_FROM_EMAIL = 'achujoseph@trivlogic.com'  
-SERVER_EMAIL = 'achujoseph@trivlogic.com'  
+SERVER_EMAIL = 'achujoseph@trivlogic.com'
 YOUR_EMAIL = 'achujoseph@trivlogic.com'
 
 # Optional: Debug email issues in development
