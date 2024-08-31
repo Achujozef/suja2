@@ -1020,7 +1020,10 @@ def jobs_details(request, job_id):
 
 @login_required(login_url='ageis_app:adminlogin')
 def user_management(request):
-    userlist = ExtendedUserModel.objects.all().order_by('-id')
+    userlist = ExtendedUserModel.objects.filter(
+        user__is_staff=False,
+        user__is_superuser=False
+    ).order_by('-id')
 
     skill_filter = request.GET.get('skill')
     qualification_filter = request.GET.get('qualification')
@@ -1930,3 +1933,18 @@ def delete_staff(request, staff_id):
     staff_member = get_object_or_404(User, id=staff_id)
     staff_member.delete()
     return redirect('ageis_app:staff_list')
+
+
+def block_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.is_active = False  # Optionally also deactivate the user account
+    user.save()
+    messages.success(request, f'{user.username} has been blocked successfully.')
+    return redirect('ageis_app:user_management') 
+
+def unblock_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.is_active = True
+    user.save()
+    messages.success(request, f'{user.username} has been unblocked.')
+    return redirect('ageis_app:user_management')

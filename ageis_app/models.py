@@ -20,6 +20,7 @@ class ExtendedUserModel(models.Model):
 
 
 
+
 class Skills(models.Model):
     user = models.ForeignKey(ExtendedUserModel, on_delete=models.CASCADE, related_name='skills')
     skill = models.CharField(max_length=255)

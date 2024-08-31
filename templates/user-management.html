@@ -401,7 +401,7 @@
                                             <input type="text" class="form-control" id="qualification" name="qualification" placeholder="Enter qualification" value="{{ request.GET.qualification }}">
                                           </div>
                                           <div class="form-group col-md-2">
-                                            <label for="experience">Experience</label>
+                                            <label for="experience">Position</label>
                                             <input type="text" class="form-control" id="experience" name="experience" placeholder="Enter experience" value="{{ request.GET.experience }}">
                                           </div>
                                           <div class="form-group col-md-2">
@@ -441,48 +441,79 @@
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Phone</th>
-                                            <th>Location</th>
+                                            <th>qulification</th>
+                                            <th>Position</th>
+                                            <th>Address</th>
                                             <th>Resume</th>
                                             <th>Actions</th>
                                           </tr>
                                         </thead>
                                         <tbody>
                                           {% for i in userlist %}
+                
                                           <tr>
-                                            {% if i.user.first_name %}
-                                            <td>{{ i.user.first_name }} {{ i.user.last_name }}</td>
+                                            <td>
+                                            {% if i.user.first_name or i.user.last_name%}
+                                            {{ i.user.first_name }} {{ i.user.last_name }}
                                             {% else %}
-                                            <td>---</td>
+                                            ---
                                             {% endif %}
-
-
+                                          </td>
+                                            <td>
                                             {% if i.user.email %}  
-                                            <td>{{ i.user.email }}</td>
+                                            {{ i.user.email }}
                                             {% else %}
-                                            <td>Not added</td>
+                                          Not added
                                             {% endif %}
-                                            
-
-                                            {% if i.user.email %}   
-                                            <td>{{ i.phone }}</td>
+                                          </td>
+                                          <td>
+                                            {% if i.phone %}   
+                                            {{ i.phone }}
                                             {% else %}
-                                            <td>Not added</td>
+                                            Not added
                                             {% endif %}
+                                          </td>
+                                          <td>
+                                            {% if i.qualifications.exists %}
+                                                <ul>
+                                                    {% for qualification in i.qualifications.all %}
+                                                        <li>{{ qualification.degree }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                No qualifications entered
+                                            {% endif %}
+                                        </td>
 
-                                              <td>
-                                                  {% if i.location %}
-                                                      {{ i.location }}
-                                                  {% endif %}
-                                                  {% if i.district %}
-                                                      {% if i.location %}, {% endif %}{{ i.district }}
-                                                  {% endif %}
-                                                  {% if i.state %}
-                                                      {% if i.location or i.district %}, {% endif %}{{ i.state }}
-                                                  {% endif %}
-                                                  {% if i.country %}
-                                                      {% if i.location or i.district or i.state %}, {% endif %}{{ i.country }}
-                                                  {% endif %}
-                                              </td>
+
+                                          <td>
+                                            {% if i.position %}
+                                            {{ i.position }}
+                                            {% else %}
+                                            Not addedd
+                                          {% endif %}
+                                          </td>
+
+
+                                          <td>
+                                            {% if i.location or i.district or i.state or i.country %}
+                                                {% if i.location and i.location != "None" %}
+                                                    {{ i.location }}
+                                                {% endif %}
+                                                {% if i.district and i.district != "None" %}
+                                                    {% if i.location and i.location != "None" %}, {% endif %}{{ i.district }}
+                                                {% endif %}
+                                                {% if i.state and i.state != "None" %}
+                                                    {% if i.location != "None" or i.district != "None" %}, {% endif %}{{ i.state }}
+                                                {% endif %}
+                                                {% if i.country and i.country != "None" %}
+                                                    {% if i.location != "None" or i.district != "None" or i.state != "None" %}, {% endif %}{{ i.country }}
+                                                {% endif %}
+                                            {% else %}
+                                                Address not entered
+                                            {% endif %}
+                                        </td>
+                                        
 
                                               {% if i.cv %}
                                               <td><a href="{{ i.cv.url }}" download>Download Resume</a></td>
@@ -493,6 +524,15 @@
                                               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editUserModal{{ i.user.id }}">
                                                 Edit
                                               </button>
+                                              {% if i.user.is_active %}
+                                              <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure you want to block this user?')) { window.location.href='{% url 'ageis_app:block_user' i.user.id %}'; }">
+                                                  Block
+                                              </button>
+                                          {% else %}
+                                              <button type="button" class="btn btn-success" onclick="if(confirm('Are you sure you want to unblock this user?')) { window.location.href='{% url 'ageis_app:unblock_user' i.user.id %}'; }">
+                                                  Unblock
+                                              </button>
+                                          {% endif %}
                                             </td>
                                           </tr>
                                     
@@ -615,7 +655,9 @@
                                             <th>Full name</th>
                                             <th>Email</th>
                                             <th>Phone</th>
-                                            <th>Location</th>
+                                            <th>qulification</th>
+                                            <th>Position</th>
+                                            <th>Address</th>
                                             <th>Resume</th>
                                             <th>Actions</th>
                                           </tr>

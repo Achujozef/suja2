@@ -241,146 +241,123 @@
                              </div>
                              <!-- /.card-header -->
                              <div class="card-body" id="text-broswer">
-                               <form method="post" enctype= 'multipart/form-data'>
+                              <form method="post" enctype='multipart/form-data'>
                                 {% csrf_token %}
+                                
                                 <div class="row">
-                                    <div class="col-xxl-12 col-xl-12 col-md-12 col-sm-12 col-12">
-                                     
-                                </div>
-
-                                </div>
-                                <div class="row mt-4">
-                                  
-                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                    {{form.job_title}}
-                                    {% comment %} <input type="text" class=" form-control w-75" placeholder="Enter Customer Name"> {% endcomment %}
+                                  <div class="col-xxl-12 col-xl-12 col-md-12 col-sm-12 col-12">
+                                    <!-- Additional form elements can be added here if needed -->
                                   </div>
                                 </div>
-
+                              
                                 <div class="row mt-4">
                                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                    {{form.company_logo}}
-                                    {% comment %} <input type="text" class=" form-control w-75" placeholder="Enter Customer Name"> {% endcomment %}
+                                    <label for="{{ form.job_title.id_for_label }}">Job Title</label>
+                                    {{ form.job_title }}
                                   </div>
                                 </div>
-
+                              
+                              
                                 <div class="row mt-4">
-                                  
                                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                    {{form.company_name}}
-                                    {% comment %} <input type="text" class=" form-control w-75" placeholder="Enter Company Name"> {% endcomment %}
+                                    <label for="{{ form.company_name.id_for_label }}">Company Name</label>
+                                    {{ form.company_name }}
                                   </div>
-                              </div>
-                          
-                        
-                         <div class="row mt-4">
-                          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                            {{form.company_email}}
-                            {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                          </div>        
-                          
-                         </div>
-
-                         <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.country}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.state}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.district}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.job_category}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.job_type}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.end_date}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.job_des}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.skills}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.experience}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.salary}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.languages}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-                           <div class="row mt-4">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                              {{form.website_link}}
-                              {% comment %} <textarea class="form-control w-75" placeholder="Enter The Review" rows="1"></textarea> {% endcomment %}
-                            </div>        
-                            
-                           </div>
-
-                     
-                               
-                             <!-- /.card-body -->
-                           </div>
-                           <div class="card-footer card-cyan">
-                            <div class="row mt-4 text-center">
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                      <input type="submit" class="btn btn-primary" value="Submit">
                                 </div>
-                               
-                            </div>
-                      
-                        </div>
-                        
-                               </form>
+                              
+                                
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.country.id_for_label }}">Country</label>
+                                    {{ form.country }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.state.id_for_label }}">State</label>
+                                    {{ form.state }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.district.id_for_label }}">District</label>
+                                    {{ form.district }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.job_category.id_for_label }}">Job Category</label>
+                                    {{ form.job_category }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.job_type.id_for_label }}">Job Type</label>
+                                    {{ form.job_type }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.end_date.id_for_label }}">End Date</label>
+                                    {{ form.end_date }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.job_des.id_for_label }}">Job Description</label>
+                                    {{ form.job_des }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.skills.id_for_label }}">Skills Required</label>
+                                    {{ form.skills }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.experience.id_for_label }}">Experience Required</label>
+                                    {{ form.experience }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.salary.id_for_label }}">Salary</label>
+                                    {{ form.salary }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.languages.id_for_label }}">Languages Required</label>
+                                    {{ form.languages }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label for="{{ form.website_link.id_for_label }}">Website Link</label>
+                                    {{ form.website_link }}
+                                  </div>
+                                </div>
+                              
+                                <div class="row mt-4">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <input type="submit" class="btn btn-primary" value="Save Changes">
+                                  </div>
+                                </div>
+                              </form>
+                              
                      </div>
                </div>
         </div>

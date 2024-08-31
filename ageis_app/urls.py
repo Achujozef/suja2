@@ -129,4 +129,6 @@ urlpatterns = [
 
     path('staff/', views.staff_list, name='staff_list'),  # This handles the list, create, and edit actions
     path('staff/delete/<int:staff_id>/', views.delete_staff, name='delete_staff'),  # This handles deletion
+    path('block-user/<int:user_id>/', views.block_user, name='block_user'),
+    path('unblock-user/<int:user_id>/', views.unblock_user, name='unblock_user'),
 ]
