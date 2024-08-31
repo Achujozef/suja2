@@ -170,12 +170,19 @@ EMAIL_HOST = 'smtp.hostinger.com'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False  # Use TLS when EMAIL_PORT is 587
 EMAIL_USE_SSL = True   # Use SSL when EMAIL_PORT is 465
-EMAIL_HOST_USER = 'info@sujaconsultancy.com'
-EMAIL_HOST_PASSWORD = 'Infosuja@2023'
+# EMAIL_HOST_USER = 'info@sujaconsultancy.com'
+# EMAIL_HOST_PASSWORD = 'Infosuja@2023'
 
-DEFAULT_FROM_EMAIL = 'info@sujaconsultancy.com'  
-SERVER_EMAIL = 'info@sujaconsultancy.com'  
-YOUR_EMAIL = 'info@sujaconsultancy.com'
+# DEFAULT_FROM_EMAIL = 'info@sujaconsultancy.com'  
+# SERVER_EMAIL = 'info@sujaconsultancy.com'  
+# YOUR_EMAIL = 'info@sujaconsultancy.com'
+
+EMAIL_HOST_USER = 'achujoseph@trivlogic.com'
+EMAIL_HOST_PASSWORD = 'Achujoseph@123'
+
+DEFAULT_FROM_EMAIL = 'achujoseph@trivlogic.com'  
+SERVER_EMAIL = 'achujoseph@trivlogic.com'  
+YOUR_EMAIL = 'achujoseph@trivlogic.com'
 
 # Optional: Debug email issues in development
 EMAIL_DEBUG = True
