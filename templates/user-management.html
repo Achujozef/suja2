@@ -467,7 +467,7 @@
                                         <tr>
                                             <td>
                                                 {% if i.user.first_name or i.user.last_name %}
-                                                {{ i.user.first_name }} {{ i.user.last_name }}
+                                                {{ i.user.id }} {{ i.user.first_name }} {{ i.user.last_name }}
                                                 {% else %}
                                                 Name not entered
                                                 {% endif %}
@@ -622,7 +622,7 @@
                                     
                                           <!-- Edit User Modal -->
                                           <div class="modal fade" id="editUserModal{{ i.user.id }}" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
@@ -633,33 +633,80 @@
                                                     <form method="POST" action="{% url 'ageis_app:edit_user' i.user.id %}" enctype="multipart/form-data">
                                                         {% csrf_token %}
                                                         <div class="modal-body">
-                                                            <!-- Fields for editing user details -->
+                                                            <!-- User Information -->
                                                             <div class="form-group">
                                                                 <label for="first_name">First Name</label>
-                                                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ i.user.first_name }}">
+                                                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ i.user.first_name }}" required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="last_name">Last Name</label>
-                                                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ i.user.last_name }}">
+                                                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ i.user.last_name }}" required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="email">Email</label>
-                                                                <input type="email" class="form-control" id="email" name="email" value="{{ i.user.email }}">
+                                                                <input type="email" class="form-control" id="email" name="email" value="{{ i.user.email }}" required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="phone">Phone</label>
-                                                                <input type="text" class="form-control" id="phone" name="phone" value="{{ i.phone }}">
+                                                                <input type="text" class="form-control" id="phone" name="phone" value="{{ i.phone }}" required>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="location">Location</label>
-                                                                <input type="text" class="form-control" id="location" name="location" value="{{ i.location }}">
+                                                                <label for="address">Address</label>
+                                                                <input type="text" class="form-control" id="address" name="address" value="{{ i.address }}" required>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="cv">Resume</label>
+                                                                <label for="location">City</label>
+                                                                <input type="text" class="form-control" id="location" name="location" value="{{ i.location }}" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="district">District</label>
+                                                                <input type="text" class="form-control" id="district" name="district" value="{{ i.district }}" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="state">State</label>
+                                                                <input type="text" class="form-control" id="state" name="state" value="{{ i.state }}" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="country">Country</label>
+                                                                <input type="text" class="form-control" id="country" name="country" value="{{ i.country }}" required>
+                                                            </div>
+                                        
+                                                            <div class="form-group">
+                                                                <label for="dob">Date of Birth</label>
+                                                                <input type="date" class="form-control" id="dob" name="dob" value="{{ i.dob|date:'Y-m-d' }}" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="gender">Gender</label>
+                                                                <select class="form-control" id="gender" name="gender" required>
+                                                                    <option value="M" {% if i.gender == 'M' %}selected{% endif %}>Male</option>
+                                                                    <option value="F" {% if i.gender == 'F' %}selected{% endif %}>Female</option>
+                                                                    <option value="O" {% if i.gender == 'O' %}selected{% endif %}>Other</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="profile_photo">Upload Profile Image</label>
+                                                                <input type="file" class="form-control" id="profile_photo" name="profile_photo">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="cv">Upload Resume</label>
                                                                 <input type="file" class="form-control" id="cv" name="cv">
                                                             </div>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" id="relocate_add" name="relocate_add" {% if i.relocate %}checked{% endif %}>
+                                                                <label class="form-check-label" for="relocate_add">Willing to relocate</label>
+                                                            </div>
+
+
+                                                            <div class="form-group">
+                                                              <label for="preferred_job_title">Preferred Job Title</label>
+                                                              <input type="text" class="form-control" id="preferred_job_title" name="preferred_job_title" value="{{ i.preferred_job_title }}" required>
+                                                          </div>
                                                           
-                                                            <!-- Section for editing Skills -->
+                                                          <div class="form-group">
+                                                              <label for="preferred_language"> Language</label>
+                                                              <input type="text" class="form-control" id="preferred_language" name="preferred_language" value="{{ i.preferred_language }}" required>
+                                                          </div>
+                                                            <!-- Skills Section -->
                                                             <h5>Skills</h5>
                                                             <div id="skillsSection">
                                                                 {% for skill in i.skills.all %}
@@ -674,56 +721,51 @@
                                                                 </div>
                                                             </div>
                                         
-                                                            <!-- Section for editing Qualifications -->
+                                                            <!-- Qualifications Section -->
                                                             <div class="form-group">
                                                                 <label for="qualifications">Qualifications</label>
                                                                 <div id="edit_qualification_fields">
-                                                                    <div id="qualificationsSection">
-                                                                        {% for qualification in i.qualifications.all %}
-                                                                        <div class="form-group qualification_field">
-                                                                            <input type="text" class="form-control mb-2" name="degree[]" value="{{ qualification.degree }}" readonly>
-                                                                            <input type="text" class="form-control mb-2" name="institution[]" value="{{ qualification.institution }}" readonly>
-                                                                            <input type="number" class="form-control mb-2" name="completion_year[]" value="{{ qualification.completion_year }}" readonly>
-                                                                            <a href="#" class="btn btn-danger btn-sm delete-qualification" data-id="{{ qualification.id }}">Delete</a>
-                                                                        </div>
-                                                                        {% endfor %}
-                                                                        <div class="form-group">
-                                                                            <input type="text" class="form-control mb-2" name="degree[]" placeholder="Add new degree">
-                                                                            <input type="text" class="form-control mb-2" name="institution[]" placeholder="Institution">
-                                                                            <input type="number" class="form-control mb-2" name="completion_year[]" placeholder="Year of Completion">
-                                                                        </div>
+                                                                    {% for qualification in i.qualifications.all %}
+                                                                    <div class="form-group qualification_field">
+                                                                        <input type="text" class="form-control mb-2" name="degree[]" value="{{ qualification.degree }}" readonly>
+                                                                        <input type="text" class="form-control mb-2" name="institution[]" value="{{ qualification.institution }}" readonly>
+                                                                        <input type="number" class="form-control mb-2" name="completion_year[]" value="{{ qualification.completion_year }}" readonly>
+                                                                        <a href="#" class="btn btn-danger btn-sm delete-qualification" data-id="{{ qualification.id }}">Delete</a>
+                                                                    </div>
+                                                                    {% endfor %}
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control mb-2" name="degree[]" placeholder="Add new degree">
+                                                                        <input type="text" class="form-control mb-2" name="institution[]" placeholder="Institution">
+                                                                        <input type="number" class="form-control mb-2" name="completion_year[]" placeholder="Year of Completion">
                                                                     </div>
                                                                 </div>
-                                                                {% comment %} <button type="button" class="btn btn-secondary" id="addQualificationEdit">Add More Qualifications</button> {% endcomment %}
                                                             </div>
                                         
-                                                            <!-- Section for editing Experience -->
+                                                            <!-- Experience Section -->
                                                             <div class="form-group">
                                                                 <label for="experience">Experience</label>
                                                                 <div id="edit_experience_fields">
-                                                                    <div id="experienceSection">
-                                                                        {% for experience in i.experiences.all %}
-                                                                        <div class="form-group experience_field">
-                                                                            <input type="text" class="form-control mb-2" name="company[]" value="{{ experience.company }}" readonly>
-                                                                            <input type="text" class="form-control mb-2" name="position[]" value="{{ experience.position }}" readonly>
-                                                                            <input type="date" class="form-control mb-2" name="start_date[]" value="{{ experience.start_date|date:"Y-m-d" }}" readonly>
-                                                                            <input type="date" class="form-control mb-2" name="end_date[]" value="{{ experience.end_date|date:"Y-m-d" }}" readonly>
-                                                                            <textarea class="form-control mb-2" name="description[]" readonly>{{ experience.description }}</textarea>
-                                                                            <a href="#" class="btn btn-danger btn-sm delete-experience" data-id="{{ experience.id }}">Delete</a>
-                                                                        </div>
-                                                                        {% endfor %}
-                                                                        <div class="form-group">
-                                                                            <input type="text" class="form-control mb-2" name="company[]" placeholder="Add new company">
-                                                                            <input type="text" class="form-control mb-2" name="position[]" placeholder="Position">
-                                                                            <input type="date" class="form-control mb-2" name="start_date[]" placeholder="Start Date">
-                                                                            <input type="date" class="form-control mb-2" name="end_date[]" placeholder="End Date">
-                                                                            <textarea class="form-control mb-2" name="description[]" placeholder="Description"></textarea>
-                                                                        </div>
+                                                                    {% for experience in i.experiences.all %}
+                                                                    <div class="form-group experience_field">
+                                                                        <input type="text" class="form-control mb-2" name="company[]" value="{{ experience.company }}" readonly>
+                                                                        <input type="text" class="form-control mb-2" name="position[]" value="{{ experience.position }}" readonly>
+                                                                        <input type="date" class="form-control mb-2" name="start_date[]" value="{{ experience.start_date|date:'Y-m-d' }}" readonly>
+                                                                        <input type="date" class="form-control mb-2" name="end_date[]" value="{{ experience.end_date|date:'Y-m-d' }}" readonly>
+                                                                        <textarea class="form-control mb-2" name="description[]" readonly>{{ experience.description }}</textarea>
+                                                                        <a href="#" class="btn btn-danger btn-sm delete-experience" data-id="{{ experience.id }}">Delete</a>
+                                                                    </div>
+                                                                    {% endfor %}
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control mb-2" name="company[]" placeholder="Add new company">
+                                                                        <input type="text" class="form-control mb-2" name="position[]" placeholder="Position">
+                                                                        <input type="date" class="form-control mb-2" name="start_date[]" placeholder="Start Date">
+                                                                        <input type="date" class="form-control mb-2" name="end_date[]" placeholder="End Date">
+                                                                        <textarea class="form-control mb-2" name="description[]" placeholder="Job Responsibilities & Achievements"></textarea>
                                                                     </div>
                                                                 </div>
-                                                                {% comment %} <button type="button" class="btn btn-secondary" id="addExperienceEdit">Add More Experience</button> {% endcomment %}
                                                             </div>
                                                         </div>
+                                        
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                                             <button type="submit" class="btn btn-primary">Save changes</button>
@@ -732,6 +774,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                           {% endfor %}
                                         </tbody>
                                         <tfoot>

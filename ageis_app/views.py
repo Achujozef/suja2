@@ -350,103 +350,199 @@ def user_registration(request):
             return redirect('ageis_app:user_registration')
     return render(request,'user-register.html')
 
-def edit_user(request, user_id):
-    if request.method == 'POST':
+# def edit_user(request, user_id):
+#     if request.method == 'POST':
 
-        print('Form Data:', request.POST)
-        print('Degrees:', request.POST.getlist('degree[]'))
-        print('Institutions:', request.POST.getlist('institution[]'))
-        print('Completion Years:', request.POST.getlist('completion_year[]'))
+#         print('Form Data:', request.POST)
+#         print('Degrees:', request.POST.getlist('degree[]'))
+#         print('Institutions:', request.POST.getlist('institution[]'))
+#         print('Completion Years:', request.POST.getlist('completion_year[]'))
       
 
 
 
+#         user = get_object_or_404(User, id=user_id)
+#         extended_user = get_object_or_404(ExtendedUserModel, user=user)
+        
+#         # Update User fields
+#         user.first_name = request.POST.get('first_name')
+#         user.last_name = request.POST.get('last_name')
+#         user.email = request.POST.get('email')
+#         user.save()
+#         # Update ExtendedUserModel fields
+#         extended_user.phone = request.POST.get('phone')
+#         extended_user.location = request.POST.get('location')
+#         # Handle the CV upload
+#         if 'cv' in request.FILES:
+#             extended_user.cv = request.FILES['cv']
+#         extended_user.save()
+        
+#         # Update Skills
+#         skills = request.POST.get('skills', '')
+#         skills_list = [skill.strip() for skill in skills.split(',') if skill.strip()]
+#         for skill in skills_list:
+#             Skills.objects.create(user=extended_user, skill=skill)
+
+
+#         # Update Qualifications
+#         degrees = request.POST.getlist('degree[]')
+#         institutions = request.POST.getlist('institution[]')
+#         completion_years = request.POST.getlist('completion_year[]')
+#         print("degrees",degrees,"institutions",institutions,"completion_years",completion_years)
+#         processed_qualification_ids = []
+
+#         for degree, institution, year in zip(degrees, institutions, completion_years):
+#             if degree and institution and year:
+#                 qualification, created = Qualification.objects.update_or_create(
+#                     user=extended_user,
+#                     degree=degree,
+#                     institution=institution,
+#                     defaults={'completion_year': int(year)}
+#                 )
+#                 processed_qualification_ids.append(qualification.id)
+
+
+#         # Process Experiences
+#         companies = request.POST.getlist('company[]')
+#         positions = request.POST.getlist('position[]')
+#         start_dates = request.POST.getlist('start_date[]')
+#         end_dates = request.POST.getlist('end_date[]')
+#         descriptions = request.POST.getlist('description[]')
+
+#         print("companies",companies)
+#         # Track processed experience IDs to avoid duplications
+#         processed_experience_ids = []
+
+#         for company, position, start_date, end_date, description in zip(companies, positions, start_dates, end_dates, descriptions):
+#             if company and position and start_date:
+#                 # Use a more specific filter to ensure uniqueness
+#                 experience = Experience.objects.filter(
+#                     user=extended_user,
+#                     company=company,
+#                     position=position,
+#                     start_date=start_date
+#                 ).first()
+                
+#                 if experience:
+#                     # Update the existing experience
+#                     experience.end_date = end_date if end_date else None
+#                     experience.description = description
+#                     experience.save()
+#                 else:
+#                     # Create a new experience
+#                     Experience.objects.create(
+#                         user=extended_user,
+#                         company=company,
+#                         position=position,
+#                         start_date=start_date,
+#                         end_date=end_date if end_date else None,
+#                         description=description
+#                     )
+
+#         # Optionally, delete experiences that were not processed
+#         # Experience.objects.filter(user=extended_user).exclude(id__in=processed_experience_ids).delete()
+#         messages.success(request, 'User information updated successfully.')
+#         return redirect('ageis_app:user_management')
+    
+#     return redirect('/')
+
+
+def edit_user(request, user_id):
+    if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
         extended_user = get_object_or_404(ExtendedUserModel, user=user)
-        
+
         # Update User fields
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
         user.email = request.POST.get('email')
         user.save()
+
         # Update ExtendedUserModel fields
         extended_user.phone = request.POST.get('phone')
         extended_user.location = request.POST.get('location')
+        extended_user.gender = request.POST.get('gender')
+        extended_user.country = request.POST.get('country')
+        extended_user.state = request.POST.get('state')
+        extended_user.district = request.POST.get('district')
+        extended_user.relocate = request.POST.get('relocate_add') == 'on'
+        extended_user.dob = request.POST.get('dob')
+        extended_user.address = request.POST.get('address')
+        extended_user.currently_working = request.POST.get('currently_working') == 'on'
+        extended_user.current_company = request.POST.get('current_company')
+        extended_user.current_start_date = request.POST.get('current_start_date')
+        extended_user.position = request.POST.get('current_position')
+        extended_user.discription = request.POST.get('discription')
+
         # Handle the CV upload
         if 'cv' in request.FILES:
             extended_user.cv = request.FILES['cv']
+        # Handle the profile photo upload
+        if 'profile_photo' in request.FILES:
+            extended_user.profile_photo = request.FILES['profile_photo']
+
         extended_user.save()
-        
+
         # Update Skills
+        Skills.objects.filter(user=extended_user).delete()  # Clear old skills
         skills = request.POST.get('skills', '')
         skills_list = [skill.strip() for skill in skills.split(',') if skill.strip()]
         for skill in skills_list:
             Skills.objects.create(user=extended_user, skill=skill)
 
-
         # Update Qualifications
+        Qualification.objects.filter(user=extended_user).delete()  # Clear old qualifications
         degrees = request.POST.getlist('degree[]')
         institutions = request.POST.getlist('institution[]')
         completion_years = request.POST.getlist('completion_year[]')
-        print("degrees",degrees,"institutions",institutions,"completion_years",completion_years)
-        processed_qualification_ids = []
-
         for degree, institution, year in zip(degrees, institutions, completion_years):
             if degree and institution and year:
-                qualification, created = Qualification.objects.update_or_create(
+                Qualification.objects.create(
                     user=extended_user,
                     degree=degree,
                     institution=institution,
-                    defaults={'completion_year': int(year)}
+                    completion_year=int(year)
                 )
-                processed_qualification_ids.append(qualification.id)
 
-
-        # Process Experiences
+        # Update Experience
+        Experience.objects.filter(user=extended_user).delete()  # Clear old experiences
         companies = request.POST.getlist('company[]')
         positions = request.POST.getlist('position[]')
         start_dates = request.POST.getlist('start_date[]')
         end_dates = request.POST.getlist('end_date[]')
         descriptions = request.POST.getlist('description[]')
-
-        print("companies",companies)
-        # Track processed experience IDs to avoid duplications
-        processed_experience_ids = []
-
         for company, position, start_date, end_date, description in zip(companies, positions, start_dates, end_dates, descriptions):
             if company and position and start_date:
-                # Use a more specific filter to ensure uniqueness
-                experience = Experience.objects.filter(
+                Experience.objects.create(
                     user=extended_user,
                     company=company,
                     position=position,
-                    start_date=start_date
-                ).first()
-                
-                if experience:
-                    # Update the existing experience
-                    experience.end_date = end_date if end_date else None
-                    experience.description = description
-                    experience.save()
-                else:
-                    # Create a new experience
-                    Experience.objects.create(
-                        user=extended_user,
-                        company=company,
-                        position=position,
-                        start_date=start_date,
-                        end_date=end_date if end_date else None,
-                        description=description
-                    )
+                    start_date=start_date,
+                    end_date=end_date if end_date else None,
+                    description=description
+                )
 
-        # Optionally, delete experiences that were not processed
-        # Experience.objects.filter(user=extended_user).exclude(id__in=processed_experience_ids).delete()
+        # Update Preferred Job Titles
+        PreferredJobTitle.objects.filter(user=user).delete()  # Clear old preferred job titles
+        preferred_job_titles = request.POST.get('preferred_job_titles', '')
+        preferred_job_titles_list = [title.strip() for title in preferred_job_titles.split(',') if title.strip()]
+        for title in preferred_job_titles_list:
+            PreferredJobTitle.objects.create(user=user, job_title=title)
+
+        # Update Languages
+        Language.objects.filter(user=user).delete()  # Clear old languages
+        languages = request.POST.get('languages', '')
+        languages_list = [language.strip() for language in languages.split(',') if language.strip()]
+        for language in languages_list:
+            Language.objects.create(user=user, language=language)
+
         messages.success(request, 'User information updated successfully.')
         return redirect('ageis_app:user_management')
-    
+
     return redirect('/')
-    
-    return HttpResponseRedirect('/')
+
+
+
 def create_user(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')

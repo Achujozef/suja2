@@ -295,7 +295,9 @@
                 <td>{{ applied_job.applied_user.phone }}</td>
                 <td>{{ applied_job.applied_job.job_title }}</td>
                 <td>Job Number {{ applied_job.applied_job.id }}</td>
+                {%if applied_job.applied_user.cv %}
                 <td><a href="{{ applied_job.applied_user.cv.url }}" download class="flex-column" >Download Resume</a></td>
+                {% endif %}
                 <td>{{ applied_job.applied_job.company.company_name }}</td>
                 <td>
                   {% if not applied_job.is_invited %}
