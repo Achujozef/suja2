@@ -254,20 +254,21 @@
             </div>
           </div>
           <!-- ./col -->
+          {% if is_owner %}
           <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box">
-              <div class="inner">
-                <h3>{{client_count}}</h3>
-
-                <p>Clients</p>
+              <!-- small box -->
+              <div class="small-box">
+                  <div class="inner">
+                      <h3>{{ client_count }}</h3>
+                      <p>Clients</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-person-add"></i>
+                  </div>
               </div>
-              <div class="icon">
-                <i class="ion ion-person-add"></i>
-              </div>
-             
-            </div>
           </div>
+          {% endif %}
+          
           <!-- ./col -->
           <div class="col-lg-3 col-6">
             <!-- small box -->
@@ -275,10 +276,10 @@
               <div class="inner">
                 <h3>{{testimonial_count}}</h3>
 
-                <p>Tessimonial</p>
+                <p>Candidates</p>
               </div>
               <div class="icon">
-                <i class="ion ion-chatboxes"></i>
+                <i class="ion ion-person-add"></i>
               </div>
               
             </div>

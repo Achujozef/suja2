@@ -1,15 +1,25 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 # Create your models here.
 
 class ExtendedUserModel(models.Model):
     def __str__(self):
         return self.user.username
+    
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
         ('O', 'Other'),
     ]
+
+    USER_TYPE_CHOICES = [
+        ('owner', 'Owner'),
+        ('manager', 'Manager'),
+        ('staff', 'Staff'),
+        ('user', 'User'),
+    ]
+
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='extenedusermodel',blank=True,null=True)
     phone = models.CharField(max_length=20,blank=True,null=True)
     cv = models.FileField(upload_to='CV',blank=True,null=True)
@@ -29,6 +39,10 @@ class ExtendedUserModel(models.Model):
     current_company = models.CharField(max_length=255, blank=True, null=True)
     current_start_date = models.DateField(blank=True, null=True)
     discription = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='created_users', blank=True, null=True)
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='user')  
+    created_at = models.DateTimeField(default=timezone.now)
+
 
 class Language(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='languages')
@@ -162,7 +176,8 @@ class Jobs(models.Model):
     languages = models.CharField(max_length=100)
     website_link = models.CharField(max_length=100)
     application_count = models.IntegerField(default=0, blank=True, null=True)
-    is_active = models.BooleanField(default=True) 
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
     
 from django.utils import timezone
 

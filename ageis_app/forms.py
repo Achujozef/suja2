@@ -166,4 +166,4 @@ class ExperienceForm(forms.ModelForm):
 class ExtendedUserModelForm(forms.ModelForm):
     class Meta:
         model = ExtendedUserModel
-        fields = ['location', 'position', 'comapany_univercity', 'profile_photo']
+        fields = '__all__'

@@ -431,7 +431,20 @@
                                                         <option value="false" {% if request.GET.is_active == 'false' %}selected{% endif %}>Inactive Jobs</option>
                                                     </select>
                                                 </div>
-                                    
+                                                {% if user_type in 'owner,manager' %}
+                                                <div class="form-group col-md-2">
+                                                    <label for="staff">Staff</label>
+                                                    <select class="form-control" id="staff" name="staff">
+                                                        <option value="">All Staff</option>
+                                                        {% for staff in staff_list %}
+                                                            <option value="{{ staff.user.id }}" {% if request.GET.staff == staff.id|stringformat:"s" %}selected{% endif %}>
+                                                                {{ staff.user.username }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            {% endif %}
+          
                                                 {% comment %} <div class="col-md-3 mb-3">
                                                     <label for="most_applied" class="form-label">Sort By:</label>
                                                     <select name="most_applied" id="most_applied" class="form-select">

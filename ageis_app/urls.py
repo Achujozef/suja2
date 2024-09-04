@@ -9,11 +9,11 @@ urlpatterns = [
     path('adminlogin', views.login, name='adminlogin'),
     path('adminlogout', views.logout, name='adminlogout'),
     path('logout', views.user_logout, name='logout'),
-    path('forgot-password', views.forgot_password,name='forgot_password'),
-    path('reset-password/<str:uidb64>/<str:token>/', views.reset_password,name='reset_password'),
+    # path('forgot-password', views.forgot_password,name='forgot_password'),
+    # path('reset-password/<str:uidb64>/<str:token>/', views.reset_password,name='reset_password'),
     path('search-jobs/', views.search_jobs, name='search_jobs'),
-    path('admin-registration', views.admin_registration, name='admin_registration'),
-    path('user-registration', views.user_registration, name='user_registration'),
+    # path('admin-registration', views.admin_registration, name='admin_registration'),
+    # path('user-registration', views.user_registration, name='user_registration'),
     path('user-management', views.user_management, name='user_management'),
     path('edit-user/<int:user_id>/', views.edit_user, name='edit_user'),
     path('create_user/', views.create_user, name='create_user'),
@@ -137,4 +137,7 @@ urlpatterns = [
     path('delete-language/<int:language_id>/', views.delete_language, name='delete_language'),
     path('add-job-title/', views.add_job_title, name='add_job_title'),
     path('delete-job-title/<int:job_title_id>/', views.delete_job_title, name='delete_job_title'),
+
+    # path('add-language/', views.add_language, name='add_language'),
+    # path('delete-language/<int:language_id>/', views.delete_language, name='delete_language'),
 ]

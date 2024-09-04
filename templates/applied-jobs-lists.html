@@ -445,7 +445,19 @@
                                                         {% endfor %}
                                                     </select>
                                                 </div>
-                                
+                                                {% if user_type in 'owner,manager' %}
+                                                <div class="form-group col-md-2">
+                                                    <label for="staff">Staff</label>
+                                                    <select class="form-control" id="staff" name="staff">
+                                                        <option value="">All Staff</option>
+                                                        {% for staff in staff_list %}
+                                                            <option value="{{ staff.user.id }}" {% if request.GET.staff == staff.id|stringformat:"s" %}selected{% endif %}>
+                                                                {{ staff.user.username }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            {% endif %}
                                                 <!-- Order Dropdown -->
                                                 {% comment %} <div class="col-md-3 mb-3">
                                                     <label for="order" class="form-label">Order:</label>
@@ -454,6 +466,10 @@
                                                         <option value="desc" {% if request.GET.order == 'desc' %}selected{% endif %}>Descending</option>
                                                     </select>
                                                 </div> {% endcomment %}
+                                                <div class="form-group">
+                                                  <label for="app_id">Filter by Application ID:</label>
+                                                  <input type="text" id="app_id" name="app_id" class="form-control" value="{{ request.GET.app_id }}">
+                                              </div>
                                             </div>
                                             
                                             <!-- Submit Button -->
@@ -486,7 +502,7 @@
                                         <tbody>
                                           {% for i in applied_jobs %}
                                         <tr>
-                                          <td>{{i.applied_user.user.first_name}} {{i.applied_user.user.last_name}}</td>
+                                          <td>Applicantion ID : {{i.id}} , {{i.applied_user.user.first_name}} {{i.applied_user.user.last_name}}</td>
                                           <td>{{i.applied_user.user.email}}</td>
                                           <td>{{i.applied_user.phone}}</td>
                                           <td>{{i.applied_job.job_title}}

@@ -438,6 +438,23 @@
                                           <label for="active_candidates">Active Candidates</label>
                                           <input type="checkbox" id="active_candidates" name="active_candidates" value="1" {% if request.GET.active_candidates %}checked{% endif %}>
                                       </div>
+                                  <div class="form-group">
+                                          <label for="user_id">Filter by User ID:</label>
+                                          <input type="text" id="user_id" name="user_id" class="form-control" value="{{ request.GET.user_id }}">
+                                      </div>
+                                      {% if user_type in 'owner,manager' %}
+                                      <div class="form-group col-md-2">
+                                          <label for="staff">Staff</label>
+                                          <select class="form-control" id="staff" name="staff">
+                                              <option value="">All Staff</option>
+                                              {% for staff in staff_list %}
+                                                  <option value="{{ staff.user.id }}" {% if request.GET.staff == staff.id|stringformat:"s" %}selected{% endif %}>
+                                                      {{ staff.user.username }}
+                                                  </option>
+                                              {% endfor %}
+                                          </select>
+                                      </div>
+                                  {% endif %}
 
                                         </div>
                                         <button type="submit" class="btn btn-success">Filter</button>
@@ -467,7 +484,7 @@
                                         <tr>
                                             <td>
                                                 {% if i.user.first_name or i.user.last_name %}
-                                                {{ i.user.id }} {{ i.user.first_name }} {{ i.user.last_name }}
+                                                {{ i.id }} {{ i.user.first_name }} {{ i.user.last_name }}
                                                 {% else %}
                                                 Name not entered
                                                 {% endif %}
@@ -790,127 +807,7 @@
                                         </tfoot>
                                       </table>
                                     </div>
-                                    
-                                    <!-- Create User Modal -->
-                                    {% comment %} <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
-                                      <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                          <div class="modal-header">
-                                            <h5 class="modal-title" id="createUserModalLabel">Create New User</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                              <span aria-hidden="true">&times;</span>
-                                            </button>
-                                          </div>
-                                          <form method="POST" action="{% url 'ageis_app:create_user' %}" enctype="multipart/form-data">
-                                            {% csrf_token %}
-                                            <div class="modal-body">
-                                              <!-- User Information -->
-                                              <div class="form-group">
-                                                <label for="first_name">First Name</label>
-                                                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter first name" required>
-                                              </div>
-                                              <div class="form-group">
-                                                <label for="last_name">Last Name</label>
-                                                <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter last name" required>
-                                              </div>
-                                              <div class="form-group">
-                                                <label for="email">Email Address</label>
-                                                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
-                                              </div>
-                                              <div class="form-group">
-                                                <label for="phone">Phone Number</label>
-                                                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
-                                              </div>
-                                              <div class="form-group">
-                                                <label for="location">Current Location</label>
-                                                <input type="text" class="form-control" id="location" name="location" placeholder="Enter current location" required>
-                                              </div>
-
-                                              <div class="form-group">
-                                                <label for="dob">Date of Birth</label>
-                                                <input type="date" class="form-control" id="dob" name="dob" required>
-                                              </div>
-                                              <div class="form-group">
-                                                <label for="gender">Gender</label>
-                                                <select class="form-control" id="gender" name="gender" required>
-                                                  <option value="M">Male</option>
-                                                  <option value="F">Female</option>
-                                                  <option value="O">Other</option>
-                                                </select>
-
-                                                
-                                              <div class="form-group">
-                                                <label for="cv">Upload Resume</label>
-                                                <input type="file" class="form-control" id="cv" name="cv" placeholder="Upload resume">
-                                              </div>
-                                    
-                                              <!-- Skills -->
-                                              <div class="form-group">
-                                                <label for="skills">Skills</label>
-                                                <textarea class="form-control" id="skills" name="skills" placeholder="Enter skills separated by commas" rows="3"></textarea>
-                                              </div>
-                                    
-                                              <!-- Qualifications -->
-                                              <div class="form-group">
-                                                <label for="qualifications">Qualifications</label>
-                                                <div id="qualification_fields">
-                                                  <div class="qualification_field">
-                                                    <div class="form-group">
-                                                      <label for="degree">Degree</label>
-                                                      <input type="text" class="form-control mb-2" name="degree[]" placeholder="e.g., B.Sc. in Computer Science">
-                                                    </div>
-                                                    <div class="form-group">
-                                                      <label for="institution">Institution</label>
-                                                      <input type="text" class="form-control mb-2" name="institution[]" placeholder="e.g., XYZ University">
-                                                    </div>
-                                                    <div class="form-group">
-                                                      <label for="completion_year">Completion Year</label>
-                                                      <input type="number" class="form-control mb-2" name="completion_year[]" placeholder="e.g., 2024">
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                                <button type="button" class="btn btn-secondary" id="addQualification">Add More Qualifications</button>
-                                              </div>
-                                              
-                                    
-                                              <!-- Experience -->
-                                              <div class="form-group">
-                                                <label for="experience">Professional Experience</label>
-                                                <div id="experience_fields">
-                                                  <div class="experience_field">
-                                                    <div class="form-group">
-                                                      <label for="company">Company Name</label>
-                                                      <input type="text" class="form-control mb-2" name="company[]" placeholder="e.g., ABC Corp">
-                                                    </div>
-                                                    <div class="form-group">
-                                                      <label for="position">Position Title</label>
-                                                      <input type="text" class="form-control mb-2" name="position[]" placeholder="e.g., Software Engineer">
-                                                    </div>
-                                                    <div class="form-group">
-                                                      <label for="start_date">Start Date</label>
-                                                      <input type="date" class="form-control mb-2" name="start_date[]">
-                                                    </div>
-                                                    <div class="form-group">
-                                                      <label for="end_date">End Date</label>
-                                                      <input type="date" class="form-control mb-2" name="end_date[]">
-                                                    </div>
-                                                    <div class="form-group">
-                                                      <label for="description">Job Responsibilities & Achievements</label>
-                                                      <textarea class="form-control mb-2" name="description[]" placeholder="Describe your responsibilities and achievements" rows="3"></textarea>
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                                <button type="button" class="btn btn-secondary" id="addExperience">Add More Experience</button>
-                                              </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                              <button type="submit" class="btn btn-primary">Create User</button>
-                                            </div>
-                                          </form>
-                                        </div>
-                                      </div>
-                                    </div> {% endcomment %}
+   
                                  <!-- Create User Modal -->
                                   <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-lg">

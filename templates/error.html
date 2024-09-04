@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error</title>
+
+</head>
+<body>
+    <div class="container">
+        <h1>An Error Occurred</h1>
+        <p>Sorry, something went wrong while processing your request.</p>
+        <p><strong>Error Message:</strong> {{ error_message }}</p>
+        <a href="{% url 'ageis_app:index' %}">Go back to home page</a>
+    </div>
+</body>
+</html>
