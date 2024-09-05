@@ -184,11 +184,14 @@
               </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'ageis_app:staff_list'%}" class="nav-link">
-              <span><img src="{% static 'dist/img/icon/complete.gif' %}" class="nav-icon"></span>
-              <p>Staff Management</p>
-              </a>
-          </li>
+            {% if request.user.extenedusermodel.user_type != 'staff' %}
+                <a href="{% url 'ageis_app:staff_list' %}" class="nav-link">
+                    <span><img src="{% static 'dist/img/icon/complete.gif' %}" class="nav-icon"></span>
+                    <p>Staff Management</p>
+                </a>
+            {% endif %}
+        </li>
+        
       
               
           
@@ -713,16 +716,37 @@
                                                                 <label class="form-check-label" for="relocate_add">Willing to relocate</label>
                                                             </div>
 
-
+                                                            
+                                                            
                                                             <div class="form-group">
-                                                              <label for="preferred_job_title">Preferred Job Title</label>
-                                                              <input type="text" class="form-control" id="preferred_job_title" name="preferred_job_title" value="{{ i.preferred_job_title }}" required>
+                                                              <label for="preferred_job_titles">Preferred Job Titles</label>
+                                                              {% for preferred_job_title in i.user.preferred_job_titles.all %}
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-control" name="preferred_job_title" value="{{ preferred_job_title.job_title }}" readonly>
+                                                                    <a href="#" class="btn btn-danger btn-sm delete-preferred_job_title" data-id="{{ preferred_job_title.id }}">Delete</a>
+                                                                </div>
+                                                            {% endfor %}
+                                                                <label for="preferred_job_titles">Add New Preferred Job Titles (Saperate with ',')</label>
+                                                                <input type="text" class="form-control" id="preferred_job_titles" name="preferred_job_titles" value="" >
+                                                            </div>
+                                                          
+                                                           
+                                                           
+                                                            <div class="form-group">
+                                                              <!-- This loop will display all the languages associated with the user -->
+                                                              {% for language in i.user.languages.all %}
+                                                                  <div class="form-group">
+                                                                      <input type="text" class="form-control" name="language" value="{{ language.language }}" readonly>
+                                                                      <a href="#" class="btn btn-danger btn-sm delete-language" data-id="{{ language.id }}">Delete</a>
+                                                                  </div>
+                                                              {% endfor %}
+                                                              <!-- Input for adding a new language -->
+                                                              <label for="languages">Language</label>
+                                                              <input type="text" class="form-control" id="languages" name="languages" value="{{ i.languages }}" >
                                                           </div>
                                                           
-                                                          <div class="form-group">
-                                                              <label for="preferred_language"> Language</label>
-                                                              <input type="text" class="form-control" id="preferred_language" name="preferred_language" value="{{ i.preferred_language }}" required>
-                                                          </div>
+
+                                                           
                                                             <!-- Skills Section -->
                                                             <h5>Skills</h5>
                                                             <div id="skillsSection">
@@ -744,9 +768,9 @@
                                                                 <div id="edit_qualification_fields">
                                                                     {% for qualification in i.qualifications.all %}
                                                                     <div class="form-group qualification_field">
-                                                                        <input type="text" class="form-control mb-2" name="degree[]" value="{{ qualification.degree }}" readonly>
-                                                                        <input type="text" class="form-control mb-2" name="institution[]" value="{{ qualification.institution }}" readonly>
-                                                                        <input type="number" class="form-control mb-2" name="completion_year[]" value="{{ qualification.completion_year }}" readonly>
+                                                                        <input type="text" class="form-control mb-2" name="degree[]" value="{{ qualification.degree }}" >
+                                                                        <input type="text" class="form-control mb-2" name="institution[]" value="{{ qualification.institution }}" >
+                                                                        <input type="number" class="form-control mb-2" name="completion_year[]" value="{{ qualification.completion_year }}" >
                                                                         <a href="#" class="btn btn-danger btn-sm delete-qualification" data-id="{{ qualification.id }}">Delete</a>
                                                                     </div>
                                                                     {% endfor %}
@@ -757,18 +781,44 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                        
+                                                            <div class="form-group">
+                                                              <label for="currently_working">Professional Experience</label>
+                                                              <div class="form-check">
+                                                                  <input type="checkbox" class="form-check-input" id="currently_working" name="currently_working" {% if i.currently_working %}checked{% endif %}>
+                                                                  <label class="form-check-label" for="currently_working">Currently Working</label>
+                                                              </div>
+                                                          </div>
+                                                            <div id="current_job_fields" style="display: {% if i.currently_working %}block{% else %}none{% endif %};">
+                                                              <div class="form-group">
+                                                                  <label for="current_company">Name of your current company</label>
+                                                                  <input type="text" class="form-control" id="current_company" name="current_company" value="{{ i.current_company }}" placeholder="Enter current company">
+                                                              </div>
+                                                              <div class="form-group">
+                                                                  <label for="current_start_date">Current Start Date</label>
+                                                                  <input type="date" class="form-control" id="current_start_date" name="current_start_date" value="{{ i.current_start_date|date:'Y-m-d' }}">
+                                                              </div>
+                                                              <div class="form-group">
+                                                                  <label for="current_position">Position</label>
+                                                                  <input type="text" class="form-control" id="current_position" name="current_position" value="{{ i.position }}" placeholder="Enter current position">
+                                                              </div>
+                                                              <div class="form-group">
+                                                                  <label for="discription">Job Responsibilities & Achievements</label>
+                                                                  <input type="text" class="form-control" id="discription" name="discription" value="{{ i.discription }}" placeholder="Enter description about your current job">
+                                                              </div>
+                                                          </div>
+
+                                                          
                                                             <!-- Experience Section -->
                                                             <div class="form-group">
                                                                 <label for="experience">Experience</label>
                                                                 <div id="edit_experience_fields">
                                                                     {% for experience in i.experiences.all %}
                                                                     <div class="form-group experience_field">
-                                                                        <input type="text" class="form-control mb-2" name="company[]" value="{{ experience.company }}" readonly>
-                                                                        <input type="text" class="form-control mb-2" name="position[]" value="{{ experience.position }}" readonly>
-                                                                        <input type="date" class="form-control mb-2" name="start_date[]" value="{{ experience.start_date|date:'Y-m-d' }}" readonly>
-                                                                        <input type="date" class="form-control mb-2" name="end_date[]" value="{{ experience.end_date|date:'Y-m-d' }}" readonly>
-                                                                        <textarea class="form-control mb-2" name="description[]" readonly>{{ experience.description }}</textarea>
+                                                                        <input type="text" class="form-control mb-2" name="company[]" value="{{ experience.company }}" >
+                                                                        <input type="text" class="form-control mb-2" name="position[]" value="{{ experience.position }}" >
+                                                                        <input type="date" class="form-control mb-2" name="start_date[]" value="{{ experience.start_date|date:'Y-m-d' }}" >
+                                                                        <input type="date" class="form-control mb-2" name="end_date[]" value="{{ experience.end_date|date:'Y-m-d' }}" >
+                                                                        <textarea class="form-control mb-2" name="description[]" >{{ experience.description }}</textarea>
                                                                         <a href="#" class="btn btn-danger btn-sm delete-experience" data-id="{{ experience.id }}">Delete</a>
                                                                     </div>
                                                                     {% endfor %}
@@ -1122,8 +1172,66 @@
               }
           });
       });
+      
   });
   </script>
+  <script>
+    $(document).on('click', '.delete-preferred_job_title', function(e) {
+        e.preventDefault();  // Prevent the default link behavior
+  
+        var jobTitleId = $(this).data('id');  // Get the ID from data attribute
+        var $button = $(this);
+  
+        $.ajax({
+            url: "{% url 'ageis_app:delete_job_title' 0 %}".replace('0', jobTitleId),  // Replace URL with job title ID
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Remove the deleted job title from the UI
+                    $button.closest('.form-group').remove();
+                    alert(response.message);
+                } else {
+                    alert('Failed to delete the job title.');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error);
+            }
+        });
+    });
+  </script>
+  <script>
+    $(document).on('click', '.delete-language', function(e) {
+        e.preventDefault();  // Prevent the default link behavior
+
+        var languageId = $(this).data('id');  // Get the ID from data attribute
+        var $button = $(this);
+
+        $.ajax({
+            url: "{% url 'ageis_app:delete_language' 0 %}".replace('0', languageId),  // Replace URL with language ID
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Remove the deleted language from the UI
+                    $button.closest('.form-group').remove();
+                    alert(response.message);
+                } else {
+                    alert('Failed to delete the language.');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error);
+            }
+        });
+    });
+</script>
+
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap JS -->
@@ -1454,6 +1562,19 @@ document.addEventListener("change", function (event) {
 
 
 </script>
+
+<script>
+  document.getElementById('currently_working').addEventListener('change', function () {
+    var currentJobFields = document.getElementById('current_job_fields');
+    if (this.checked) {
+      currentJobFields.style.display = 'block';
+    } else {
+      currentJobFields.style.display = 'none';
+    }
+  });
+</script>
+
+
 <script>
   function showDatePicker() {
       var datePicker = document.getElementById("EnterENDDate");

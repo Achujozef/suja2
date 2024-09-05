@@ -546,13 +546,12 @@ def edit_user(request, user_id):
             user = get_object_or_404(User, id=user_id)
             extended_user = get_object_or_404(ExtendedUserModel, user=user)
 
-            # Update User fields
             user.first_name = request.POST.get('first_name')
             user.last_name = request.POST.get('last_name')
             user.email = request.POST.get('email')
             user.save()
 
-            # Update ExtendedUserModel fields
+
             extended_user.phone = request.POST.get('phone')
             extended_user.location = request.POST.get('location')
             extended_user.gender = request.POST.get('gender')
@@ -567,25 +566,38 @@ def edit_user(request, user_id):
             extended_user.current_start_date = request.POST.get('current_start_date')
             extended_user.position = request.POST.get('current_position')
             extended_user.discription = request.POST.get('discription')
+            extended_user.currently_working = 'currently_working' in request.POST
+        
+            if extended_user.currently_working:
+                extended_user.current_company = request.POST.get('current_company')
+                extended_user.current_start_date = request.POST.get('current_start_date')
+                extended_user.current_position = request.POST.get('current_position')
+                extended_user.discription = request.POST.get('discription')
+            else:
+                # Clear current job fields if not currently working
+                extended_user.current_company = ''
+                extended_user.current_start_date = None
+                extended_user.current_position = ''
+                extended_user.discription = ''
 
-            # Handle the CV upload
             if 'cv' in request.FILES:
                 extended_user.cv = request.FILES['cv']
-            # Handle the profile photo upload
+
             if 'profile_photo' in request.FILES:
                 extended_user.profile_photo = request.FILES['profile_photo']
 
             extended_user.save()
 
-            # Update Skills
-            Skills.objects.filter(user=extended_user).delete()  # Clear old skills
+
+            
             skills = request.POST.get('skills', '')
             skills_list = [skill.strip() for skill in skills.split(',') if skill.strip()]
             for skill in skills_list:
-                Skills.objects.create(user=extended_user, skill=skill)
+                if not Skills.objects.filter(user=extended_user, skill=skill).exists():
+                    Skills.objects.create(user=extended_user, skill=skill)
 
-            # Update Qualifications
-            Qualification.objects.filter(user=extended_user).delete()  # Clear old qualifications
+            
+            Qualification.objects.filter(user=extended_user).delete() 
             degrees = request.POST.getlist('degree[]')
             institutions = request.POST.getlist('institution[]')
             completion_years = request.POST.getlist('completion_year[]')
@@ -598,8 +610,8 @@ def edit_user(request, user_id):
                         completion_year=int(year)
                     )
 
-            # Update Experience
-            Experience.objects.filter(user=extended_user).delete()  # Clear old experiences
+
+            Experience.objects.filter(user=extended_user).delete()  
             companies = request.POST.getlist('company[]')
             positions = request.POST.getlist('position[]')
             start_dates = request.POST.getlist('start_date[]')
@@ -616,27 +628,27 @@ def edit_user(request, user_id):
                         description=description
                     )
 
-            # Update Preferred Job Titles
-            PreferredJobTitle.objects.filter(user=user).delete()  # Clear old preferred job titles
+           
             preferred_job_titles = request.POST.get('preferred_job_titles', '')
             preferred_job_titles_list = [title.strip() for title in preferred_job_titles.split(',') if title.strip()]
             for title in preferred_job_titles_list:
-                PreferredJobTitle.objects.create(user=user, job_title=title)
+                if not PreferredJobTitle.objects.filter(user=user, job_title=title).exists():
+                    PreferredJobTitle.objects.create(user=user, job_title=title)
 
-            # Update Languages
-            Language.objects.filter(user=user).delete()  # Clear old languages
+            
             languages = request.POST.get('languages', '')
             languages_list = [language.strip() for language in languages.split(',') if language.strip()]
             for language in languages_list:
-                Language.objects.create(user=user, language=language)
+                if not Language.objects.filter(user=user, language=language).exists():
+                    Language.objects.create(user=user, language=language)
 
             messages.success(request, 'User information updated successfully.')
             return redirect('ageis_app:user_management')
         
         except Exception as e:
-            # Log the exception or handle it as needed
+
             print(f"An error occurred: {e}")
-            # Add an error message to be displayed on the error page
+
             messages.error(request, f"An unexpected error occurred: {e}")
             return render(request, 'error.html', {'error_message': str(e)})
         
@@ -691,6 +703,7 @@ def create_user(request):
                 current_start_date=current_start_date if current_start_date else None,
                 position=current_position,
                 discription = discription,
+                created_by = request.user
 
             )
             extended_user.save()
@@ -1762,7 +1775,7 @@ def district_delete(request, district_id):
 
 from django .core.paginator import Paginator, EmptyPage , PageNotAnInteger
 
-@login_required(login_url='ageis_app:login')
+
 def jobs_frontend(request):
     extended_user = None
     
@@ -1807,7 +1820,11 @@ def jobs_frontend(request):
 def jobs_frontend_cat(request, cat_id=None):
     try:
         if cat_id:
-            # Ensure cat_id is an integer and handle invalid ID
+            if request.user.is_authenticated:
+                user = request.user
+                extended_user_qs = ExtendedUserModel.objects.filter(user=user)
+                if extended_user_qs.exists():
+                    extended_user = extended_user_qs.first()
             try:
                 cat_id = int(cat_id)
                 jobs = Jobs.objects.filter(job_category__id=cat_id)
@@ -1818,7 +1835,8 @@ def jobs_frontend_cat(request, cat_id=None):
             jobs = Jobs.objects.all()
 
         context = {
-            'jobs': jobs
+            'jobs': jobs,
+            'extended_user' : extended_user
         }
         return render(request, 'jobsfrontend.html', context)
 
@@ -2156,7 +2174,11 @@ def applied_jobs(request):
 
 def search_jobs(request):
     try:
-        # Retrieve the query parameter
+        if request.user.is_authenticated:
+            user = request.user
+            extended_user_qs = ExtendedUserModel.objects.filter(user=user)
+            if extended_user_qs.exists():
+                extended_user = extended_user_qs.first()
         query = request.GET.get('query', '')
 
         # Ensure query is a string and handle potential invalid queries
@@ -2175,7 +2197,7 @@ def search_jobs(request):
             } for job in jobs
         ]
         
-        return JsonResponse({'jobs': jobs_list})
+        return JsonResponse({'jobs': jobs_list ,'extended_user' : extended_user})
 
     except ValueError as ve:
         # Handle invalid query parameter
@@ -2395,7 +2417,7 @@ def shortlisted_jobs(request):
     selected_job_id = None
 
     try:
-        # Retrieve all clients and jobs
+        user_is_staff = request.user.extenedusermodel.user_type == 'staff'
         clients = Clients.objects.all()
         jobs = Jobs.objects.all()
 
@@ -2418,6 +2440,11 @@ def shortlisted_jobs(request):
             selected_job_id = int(selected_job_id)  # Convert to integer for filtering
             selected_job = get_object_or_404(Jobs, pk=selected_job_id)
             applied_jobs = applied_jobs.filter(applied_job=selected_job)
+
+
+        if user_is_staff:
+            applied_jobs = applied_jobs.filter(applied_job__added_by=request.user)
+
 
     except ValueError as e:
         # Handle invalid integer conversion for client or job IDs
@@ -2451,6 +2478,9 @@ def shortlisted_jobs(request):
         'selected_client_id': selected_client_id,
         'selected_job_id': selected_job_id,
     })
+
+
+
 from django.http import Http404
 def remove_from_shortlist(request, job_id):
     try:
@@ -2682,7 +2712,7 @@ def aboutus_delete(request, about_id):
 
 
 
-@login_required(login_url='ageis_app:login')
+
 def clients(request):
     try:
         extended_user = None
@@ -2711,7 +2741,7 @@ def clients(request):
 
 
 
-@login_required(login_url='ageis_app:login')
+
 def resume_writing(request):
     extended_user = None
     try:
@@ -2734,7 +2764,7 @@ def resume_writing(request):
         return render(request, 'resumewriting.html', {'error_message': "An unexpected error occurred while retrieving your profile. Please try again later."})
 
 
-@login_required(login_url='ageis_app:login')
+
 def interviewtips(request):
     try:
         extended_user = None
@@ -2757,7 +2787,7 @@ def interviewtips(request):
         return render(request, 'interviewtips.html', {'extended_user': None})
 
 
-@login_required(login_url='ageis_app:login')
+
 def contact_us(request):
     extended_user = None
     if request.user.is_authenticated:
@@ -2946,21 +2976,30 @@ def add_job_title(request):
 
 @login_required
 def delete_job_title(request, job_title_id):
-    try:
-        job_title = get_object_or_404(PreferredJobTitle, id=job_title_id, user=request.user)
-        
-        # Check if the user has permission to delete the job title
-        if job_title.user != request.user:
-            return HttpResponseForbidden("You do not have permission to delete this job title.")
 
-        job_title.delete()
-        messages.success(request, 'Job title deleted successfully.')
+    user_type = request.user.extenedusermodel.user_type 
+
+    try:
+        if user_type == 'user':
+            job_title = get_object_or_404(PreferredJobTitle, id=job_title_id, user=request.user)
+            if job_title.user != request.user:
+                return HttpResponseForbidden("You do not have permission to delete this job title.")
+
+            job_title.delete()
+            messages.success(request, 'Job title deleted successfully.')
+            
+        else:
+            job_title = get_object_or_404(PreferredJobTitle, id=job_title_id)
+            job_title.delete()
+            return JsonResponse({'status': 'success', 'message': 'Job title deleted successfully.'})
         
     except Exception as e:
-        # Log the exception or handle it as needed
         print(f"An error occurred: {e}")
-        messages.error(request, 'An unexpected error occurred while deleting the job title. Please try again later.')
-    
+
+        if user_type == 'user':
+            messages.error(request, 'An unexpected error occurred while deleting the job title. Please try again later.')
+        else:
+            return JsonResponse({'status': 'error', 'message': 'An error occurred while deleting the job title. Please try again.'}, status=500)
     return redirect('ageis_app:user_profile')
 
 
@@ -3184,23 +3223,23 @@ def contact_update(request):
     
 def delete_qualification_view(request, qualification_id):
     try:
-        # Attempt to retrieve and delete the qualification
+        user_type = request.user.extenedusermodel.user_type 
+        
         qualification = get_object_or_404(Qualification, id=qualification_id)
         qualification.delete()
-        
-        # Add a success message
-        messages.success(request, 'Qualification deleted successfully.')
-    
+        if user_type == 'user':
+            messages.success(request, 'Qualification deleted successfully.')
+        else:
+            return JsonResponse({'status': 'success', 'message': 'Qualification deleted successfully.'})
+
     except Exception as e:
-        # Log the exception or handle it as needed
         print(f"An error occurred: {e}")
-        # Add an error message to be displayed
-        messages.error(request, 'An unexpected error occurred while trying to delete the qualification. Please try again later.')
-    
-    # Redirect to the user profile page
+        if user_type == 'user':
+            messages.error(request, 'An unexpected error occurred while trying to delete the qualification. Please try again later.')
+        else:
+            return JsonResponse({'status': 'error','message': 'An unexpected error occurred while trying to delete the qualification. Please try again later.'})
     return redirect('ageis_app:user_profile')
     
-    # If not a POST request, return an error response
 
 
 
@@ -3246,19 +3285,19 @@ def add_qualification_view(request):
 
 def delete_skill_view(request, skill_id):
     try:
-        # Fetch the skill object or return a 404 if not found
+        user_type = request.user.extenedusermodel.user_type 
         skill = get_object_or_404(Skills, id=skill_id)
-        # Delete the skill
         skill.delete()
-        # Add a success message
-        messages.success(request, 'Skill deleted successfully.')
+        if user_type == 'user':
+            messages.success(request, 'Skill deleted successfully.')
+        else:
+            return JsonResponse({'status': 'success', 'message': 'Skill deleted successfully.'})
     except Exception as e:
-        # Log the exception or handle it as needed
         print(f"An error occurred: {e}")
-        # Add an error message
-        messages.error(request, 'An unexpected error occurred while deleting the skill. Please try again later.')
-    
-    # Redirect to the user profile page
+        if user_type == 'user':
+            messages.error(request, 'An unexpected error occurred while deleting the skill. Please try again later.')
+        else:
+            return JsonResponse({'status': 'error','message': 'An unexpected error occurred while deleting the skill. Please try again later.'})
     return redirect('ageis_app:user_profile')
 
 def add_skill(request):
@@ -3273,13 +3312,13 @@ def add_skill(request):
                 messages.error(request, "No skills provided. Please enter at least one skill.")
                 return redirect('ageis_app:user_profile')
 
-            # Split the input string by commas and strip any leading/trailing whitespace
+
             skills = [skill.strip() for skill in skill_data.split(',') if skill.strip()]
 
-            # Create a Skills object for each skill in the list
+
             for skill in skills:
                 Skills.objects.create(
-                    user=user_profile,  # Correctly reference the user profile
+                    user=user_profile, 
                     skill=skill,
                 )
 
@@ -3294,7 +3333,6 @@ def add_skill(request):
         return redirect('ageis_app:user_profile')
     
     except Exception as e:
-        # Log the exception or handle it as needed
         print(f"An error occurred: {e}")
         messages.error(request, "An unexpected error occurred. Please try again later.")
         return redirect('ageis_app:user_profile')
@@ -3375,14 +3413,20 @@ def change_resume_view(request):
 
 
 def delete_experience_view(request, experience_id):
-    experience = get_object_or_404(Experience, id=experience_id)
+
+    user_type = request.user.extenedusermodel.user_type 
+    
     try:
+        experience = get_object_or_404(Experience, id=experience_id)
         experience.delete()
-        return redirect('ageis_app:user_profile')
+        if user_type == 'user':
+            return redirect('ageis_app:user_profile')
+        else:
+            return JsonResponse({'status':'success','message': 'Experience deleted successfully.'})
     except Exception as e:
         return render(request, 'error.html', {'error_message': str(e)})
 
-  
+
     
     
 @login_required
@@ -3416,24 +3460,27 @@ def add_language(request):
 @login_required
 def delete_language(request, language_id):
     try:
-        # Fetch the language object or raise a 404 error if not found
-        language = get_object_or_404(Language, id=language_id, user=request.user)
-        
-        # Delete the language object
-        language.delete()
-        
-        # Provide a success message
-        messages.success(request, 'Language deleted successfully.')
-        
+        user_type = request.user.extenedusermodel.user_type
+        if user_type == 'user':
+
+            language = get_object_or_404(Language, id=language_id, user=request.user)
+            language.delete()
+            messages.success(request, 'Language deleted successfully.')
+
+        else:
+            language = get_object_or_404(Language, id=language_id)
+            language.delete()
+            return JsonResponse({'status': 'success', 'message': 'Language deleted successfully.'})
     except Exception as e:
-        # Log the exception or handle it as needed
+        
         print(f"An error occurred: {e}")
         
-        # Provide an error message
-        messages.error(request, 'An unexpected error occurred while trying to delete the language. Please try again later.')
-    
-    # Redirect to the user profile page
+        if user_type == 'user':
+            messages.error(request, 'An unexpected error occurred while trying to delete the language. Please try again later.')
+        else:
+            return JsonResponse({'status': 'error', 'message': 'An error occurred while deleting the Language. Please try again.'}, status=500)
     return redirect('ageis_app:user_profile')
+
 
 @login_required
 def staff_list(request):
@@ -3585,4 +3632,3 @@ def unblock_user(request, user_id):
         return redirect('ageis_app:user_management')
     
     return redirect('ageis_app:user_management')
-
