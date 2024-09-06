@@ -192,6 +192,24 @@
             {% endif %}
         </li>
         
+
+          {% if request.user.extendedusermodel.user_type == 'staff' %}
+              <p>Staff</p>
+              {% if request.user.first_name and request.user.last_name %}
+                  <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+              {% endif %}
+          {% elif request.user.extendedusermodel.user_type == 'owner' %}
+              <p>Super Admin</p>
+              {% if request.user.first_name and request.user.last_name %}
+                  <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+              {% endif %}
+          {% elif request.user.extendedusermodel.user_type == 'manager' %}
+              <p>Admin</p>
+              {% if request.user.first_name and request.user.last_name %}
+                  <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+              {% endif %}
+          {% endif %}
+
       
               
           
@@ -218,6 +236,24 @@
               <li class="breadcrumb-item active">Users</li>
             </ol>
           </div><!-- /.col -->
+          {% if request.user.extenedusermodel.user_type == 'staff' %}
+          <p>Staff</p>
+          {% if request.user.first_name and request.user.last_name %}
+              <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+          {% endif %}
+      {% elif request.user.extenedusermodel.user_type == 'owner' %}
+          <p>Super Admin</p>
+          {% if request.user.first_name and request.user.last_name %}
+              <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+          {% endif %}
+      {% elif request.user.extenedusermodel.user_type == 'manager' %}
+          <p>Admin</p>
+          {% if request.user.first_name and request.user.last_name %}
+              <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+          {% endif %}
+      {% endif %}
+      
+
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
     </div>

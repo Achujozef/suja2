@@ -3503,8 +3503,14 @@ def staff_list(request):
                 username = request.POST['username']
                 email = request.POST['email']
                 password = request.POST['password']
+                first_name = request.POST['first_name']
+                last_name = request.POST['last_name']
+
+
                 user = User.objects.create_user(username=username, email=email, password=password)
                 user.is_staff = True
+                user.first_name = first_name
+                user.last_name = last_name
                 user.save()
 
                 phone = request.POST.get('phone')
@@ -3531,6 +3537,8 @@ def staff_list(request):
                 staff_member.username = request.POST['username']
                 staff_member.email = request.POST['email']
                 password = request.POST.get('password')
+                staff_member.first_name = request.POST['first_name']
+                staff_member.last_name = request.POST['last_name']
                 if password:
                     staff_member.set_password(password)
 
