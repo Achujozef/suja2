@@ -138,6 +138,8 @@ urlpatterns = [
     path('add-job-title/', views.add_job_title, name='add_job_title'),
     path('delete-job-title/<int:job_title_id>/', views.delete_job_title, name='delete_job_title'),
 
+    path('error_page/', views.error_page, name='error_page'),
+
     # path('add-language/', views.add_language, name='add_language'),
     # path('delete-language/<int:language_id>/', views.delete_language, name='delete_language'),
 ]

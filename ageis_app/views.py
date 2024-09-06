@@ -17,6 +17,11 @@ from django.contrib.auth import authenticate, login
 from datetime import datetime, timedelta 
 from django.core.exceptions import PermissionDenied
 
+
+def error_page(request):
+    return render(request, 'error.html', {})
+
+
 def index(request):
     try:
 
@@ -119,7 +124,7 @@ def submit_whatsapp_number(request):
         print(f"An error occurred: {e}")
         # Add an error message to be displayed on the error page
         messages.error(request, "An unexpected error occurred while saving your WhatsApp number. Please try again later.")
-        return redirect('error_page')  # Redirect to a custom error page if desired
+        return redirect('ageis_app:error_page')  # Redirect to a custom error page if desired
     
 
 def jobs_by_application_count(request):
@@ -1830,7 +1835,7 @@ def jobs_frontend_cat(request, cat_id=None):
                 jobs = Jobs.objects.filter(job_category__id=cat_id)
             except ValueError:
                 messages.error(request, "Invalid category ID.")
-                return redirect('error_page')  # Redirect to a custom error page or home page
+                return redirect('ageis_app:error_page')  # Redirect to a custom error page or home page
         else:
             jobs = Jobs.objects.all()
 
@@ -3163,7 +3168,7 @@ def profile_update(request):
 
     except ObjectDoesNotExist:
         messages.error(request, 'User profile does not exist.')
-        return redirect('error_page')  # Redirect to a custom error page
+        return redirect('ageis_app:error_page')  # Redirect to a custom error page
 
     except Exception as e:
         # Log the exception or handle it as needed
@@ -3561,7 +3566,7 @@ def staff_list(request):
         # Log the exception or handle it as needed
         print(f"An error occurred: {e}")
         messages.error(request, "An unexpected error occurred. Please try again later.")
-        return redirect('error_page')  # Redirect to a custom error page
+        return redirect('ageis_app:error_page')  # Redirect to a custom error page
 
     return render(request, 'staff_list.html', {
         'staff_members': staff_members,
